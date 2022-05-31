@@ -18,6 +18,7 @@ public class House : MonoBehaviour
     public Dictionary<Transform, HouseEntityType> CureetHouse { get => cureetHouse; }
     public List<string> HomeassistantEntities { get => homeassistantEntities; }
 
+    public Transform canvas;
     List<HassEntity> lis;
     Dictionary<Transform, HouseEntityType> cureetHouse;
     List<string> homeassistantEntities;
@@ -34,6 +35,10 @@ public class House : MonoBehaviour
 
     void Start()
     {
+        var t = Resources.Load<Transform>("UI/SouquanPanel");
+        Instantiate(t, canvas);
+        t = Resources.Load<Transform>("UI/DashangPanel");
+        Instantiate(t, canvas);
         Shijie.OnGetConfig += OnGetConfig;
         Shijie.OnHassFlush += OnHassFlush;
 #if UNITY_WEBGL && !UNITY_EDITOR
