@@ -6,9 +6,8 @@ using UnityEngine.UI;
 
 public class HousePanel : MonoBehaviour
 {
-    public float RoSpeed => ro.value;
     public static HousePanel Instance;
-    public Slider tianguang, rain, snow, fog, lighting, ro, ranyuanjin;
+    public Slider tianguang, rain, snow, fog, lighting, ranyuanjin;
     public Button changeCamera, edit;
     public Toggle roOrMove;
     public Button resetCamera;
@@ -31,7 +30,7 @@ public class HousePanel : MonoBehaviour
         });
         changeCamera.onClick.AddListener(() =>
         {
-            if (Reconstitution.Instance.IsEdit)
+            if (Reconstitution.Instance.IsEdit || CameraControllerForUnity.Instance.enabled == false)
                 return;
             if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.third)
             {

@@ -7,7 +7,9 @@ using UnityEngine.UI;
 public class SysPanel : MonoBehaviour
 {
     public Button save, weather;
-
+    public Toggle autoSun;
+    public Slider sunIn, ro;
+    public GameObject suninpa;
     private void Start()
     {
         save.onClick.AddListener(Save);
@@ -20,6 +22,20 @@ public class SysPanel : MonoBehaviour
             });
         });
         weather.GetComponentInChildren<Text>().text = HouseWeather.Instance.Entity_id;
+
+        autoSun.onValueChanged.AddListener((x) =>
+        {
+            suninpa.SetActive(!x);
+            CacheData.AutoSun = x;
+        });
+        suninpa.SetActive(!autoSun.isOn);
+        ro.onValueChanged.AddListener((x) => { CacheData.RoSpeed = x; });
+        sunIn.onValueChanged.AddListener((x) =>
+        {
+            CacheData.SunIntensity = x;
+            HouseWeather.Instance.SetTianGuang(x);
+        });
+        sunIn.value = CacheData.SunIntensity;
     }
 
     private void Save()

@@ -103,7 +103,7 @@ public class House : MonoBehaviour
         var ss = message.Split(' ');
         var id = ss[0];
         var va = ss[1];
-        if (id == "sun.sun")
+        if (CacheData.AutoSun && id == "sun.sun")
         {
             AnsSun(va);
         }
@@ -774,7 +774,7 @@ public class House : MonoBehaviour
         }
         if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.third)
         {
-            CameraControllerForUnity.Instance.xAngle += Time.deltaTime * HousePanel.Instance.RoSpeed;
+            CameraControllerForUnity.Instance.xAngle += Time.deltaTime * CacheData.RoSpeed;
             if (CameraControllerForUnity.Instance.xAngle > 360)
                 CameraControllerForUnity.Instance.xAngle -= 360;
         }

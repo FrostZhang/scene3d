@@ -24,7 +24,7 @@ public class BundleHelp : EditorWindow
             var path = System.Environment.CurrentDirectory + "/Assets/AssetsBundle";
             var ds = Directory.GetDirectories(path);
             List<AssetBundleBuild> buildMap = new List<AssetBundleBuild>(500);
-            Delete();
+            //Delete();
             foreach (var item in ds)
             {
                 var dirname = new DirectoryInfo(item).Name;
@@ -169,17 +169,51 @@ public class BundleHelp : EditorWindow
                 if (item.EndsWith(".prefab"))
                 {
                     var path = item.Remove(0, item.IndexOf("Assets/"));
-                    var o = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                    var o = AssetDatabase.LoadMainAssetAtPath(path);
                     if (o)
                     {
-                        AssetPreview.SetPreviewTextureCacheSize(512);
-                        var te = AssetPreview.GetAssetPreview(o);
-                        System.IO.File.WriteAllBytes(Application.streamingAssetsPath + "/test.png", te.EncodeToPNG());
+                        if (o is GameObject)
+                        {
+                            var g = o as GameObject;
+                            g = Instantiate(g);
+                            g.transform.position = new Vector3(0, 0, 5);
+
+                            var bounds = GetMaxBounds(g);
+                            var boundRadius = bounds.extents.magnitude;
+                            var mainCa = Camera.main;
+                            var finalDistance = boundRadius / (2.0f * Mathf.Tan(0.5f * mainCa.fieldOfView * Mathf.Deg2Rad)) * 1;
+                            if (float.IsNaN(finalDistance))
+                            {
+                                finalDistance = 15;
+                            }
+                            mainCa.transform.forward = (g.transform.position - mainCa.transform.position);
+                            mainCa.transform.position = g.transform.position - mainCa.transform.forward.normalized * finalDistance;
+                        }
                         break;
                     }
                 }
             }
         }
+    }
+
+    public static Bounds GetMaxBounds(GameObject t)
+    {
+        Bounds b = new Bounds();
+        Renderer[] childRenderers = t.gameObject.GetComponentsInChildren<Renderer>();
+        if (childRenderers.Length > 0)
+        {
+            b = childRenderers[0].bounds;
+            for (int i = 1; i < childRenderers.Length; ++i)
+            {
+                b.Encapsulate(childRenderers[i].bounds);
+            }
+        }
+        else
+        {
+            b.center = t.transform.position;
+        }
+
+        return b;
     }
 
     GameObject go;
