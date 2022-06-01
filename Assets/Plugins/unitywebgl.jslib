@@ -1,48 +1,50 @@
 mergeInto(LibraryManager.library, 
 {
- 
-  AsherLink3DStart: function ()
+   WebglAsherLink3DStart: function ()
   {
-    AsherLink3DStart();
+    if(typeof AsherLink3DStart != "undefined" && AsherLink3DStart instanceof Function){
+        AsherLink3DStart();
+    }
   },
-  
-  AsherLink3DClickMessage: function(str)
+   WebglAsherLink3DClickMessage: function(str)
   {
-	 AsherLink3DClickMessage(Pointer_stringify(str));
+    if(typeof AsherLink3DClickMessage != "undefined" && AsherLink3DClickMessage instanceof Function){
+        AsherLink3DClickMessage(Pointer_stringify(str));
+    }
   },
-  AsherLink3DLongClickMessage: function(str)
+   WebglAsherLink3DLongClickMessage: function(str)
   {
-	 AsherLink3DLongClickMessage(Pointer_stringify(str));
+    if(typeof AsherLink3DLongClickMessage != "undefined" && AsherLink3DLongClickMessage instanceof Function){
+        AsherLink3DLongClickMessage(Pointer_stringify(str));
+    }
   },
-  AsherLink3DConfig: function(str)
+   WebglAsherLink3DConfig: function(str)
   {
-	AsherLink3DConfig(Pointer_stringify(str));
+    if(typeof AsherLink3DConfig != "undefined" && AsherLink3DConfig instanceof Function){
+        AsherLink3DConfig(Pointer_stringify(str));
+    }
   },
   HelloString: function (str) 
   {
     window.alert(Pointer_stringify(str));
   },
- AsherLink3DWebLog: function(str)
+  WebglAsherLink3DWebLog: function(str)
  {
-     AsherLink3DWebLog(Pointer_stringify(str));
+    console.log(Pointer_stringify(str))
  },
-   HelloFloat: function () 
-   {
-       return 1;
-   },
-   HelloFloat: function()
-     {
-     var userAgentInfo = navigator.userAgent;      
-        var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];    
-        var flag = true;       
-        for (var v = 0; v < Agents.length; v++)
-        {        
-         if (userAgentInfo.indexOf(Agents[v]) > 0)
-         {   
-          return 1; //如果是手机端就返回1
-           break;       
-         }     
-        }       
+ WebglHelloFloat: function()
+  {
+  var userAgentInfo = navigator.userAgent;      
+    var Agents = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];    
+    var flag = true;       
+    for (var v = 0; v < Agents.length; v++)
+    {        
+      if (userAgentInfo.indexOf(Agents[v]) > 0)
+      {   
+        return 1; //如果是手机端就返回1
+        break;       
+      }     
+    }       
         return 2; //如果是pc就返回2
-    },
+  },
  });

@@ -48,24 +48,24 @@ public class Shijie : MonoBehaviour
     }
 
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    static extern void AsherLink3DStart();
+    static extern void WebglAsherLink3DStart();
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    static extern void AsherLink3DClickMessage(string mes);
+    static extern void WebglAsherLink3DClickMessage(string mes);
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    static extern void AsherLink3DLongClickMessage(string mes);
+    static extern void WebglAsherLink3DLongClickMessage(string mes);
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    static extern void AsherLink3DWebLog(string mes);
+    static extern void WebglAsherLink3DWebLog(string mes);
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    static extern void AsherLink3DConfig(string mes);
+    static extern void WebglAsherLink3DConfig(string mes);
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    private static extern float HelloFloat();
+    private static extern float WebglHelloFloat();
 
     public static void Link3DStart()
     {
 #if UNITY_EDITOR
         Debug.Log("Link3DStart");
 #else
-        AsherLink3DStart();
+         WebglAsherLink3DStart();
 #endif
 
 
@@ -76,7 +76,7 @@ public class Shijie : MonoBehaviour
 #if UNITY_EDITOR
         Debug.Log(mes);
 #else
-        AsherLink3DClickMessage(mes);
+         WebglAsherLink3DClickMessage(mes);
 #endif
     }
 
@@ -85,7 +85,7 @@ public class Shijie : MonoBehaviour
 #if UNITY_EDITOR
         Debug.Log(mes);
 #else
-        AsherLink3DLongClickMessage(mes);
+         WebglAsherLink3DLongClickMessage(mes);
 #endif
     }
 
@@ -94,7 +94,7 @@ public class Shijie : MonoBehaviour
 #if UNITY_EDITOR
         Debug.Log(mes);
 #else
-        AsherLink3DWebLog(mes);
+         WebglAsherLink3DWebLog(mes);
 #endif
     }
 
@@ -103,7 +103,7 @@ public class Shijie : MonoBehaviour
 #if UNITY_EDITOR
         Debug.Log(mes);
 #else
-        AsherLink3DConfig(mes);
+         WebglAsherLink3DConfig(mes);
 #endif
     }
 
@@ -112,7 +112,7 @@ public class Shijie : MonoBehaviour
 #if UNITY_EDITOR
         return 0;
 #else
-        return HelloFloat();
+        return  WebglHelloFloat();
 #endif
     }
 }
