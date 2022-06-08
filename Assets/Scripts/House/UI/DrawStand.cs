@@ -74,7 +74,7 @@ public class DrawStand : MonoBehaviour
 
     async void Ini()
     {
-        await new WaitUntil(() => CreatPanel.Instance.zdic != null);
+        await new WaitUntilAsync(() => CreatPanel.Instance.zdic != null);
         var dic = CreatPanel.Instance.zdic;
         if (dic.ContainsKey("stand"))
         {
@@ -102,7 +102,7 @@ public class DrawStand : MonoBehaviour
                     CameraControllerForUnity.Instance.canUseMouseCenter = true;
                     if (!EventSystem.current.IsPointerOverGameObject())
                     {
-                        CreatAreaLight();
+                        Creat();
                     }
                     choose = null;
                 };
@@ -112,7 +112,7 @@ public class DrawStand : MonoBehaviour
         }
     }
 
-    private async void CreatAreaLight()
+    private async void Creat()
     {
         var p = Input.mousePosition;
         p = Camera.main.ScreenToWorldPoint(p);
