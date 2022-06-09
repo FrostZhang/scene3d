@@ -12,9 +12,12 @@ public class Eye : MonoBehaviour
 
     void Awake()
     {
-        Show(false);
         var r = textMesh.GetComponent<MeshRenderer>();
-        r.material = new Material(r.material);
+        var ma = r.material;
+        textMesh.font = Help.Instance.chinese;
+        r.material = new Material(ma);
+        r.material.mainTexture = Help.Instance.chinese.material.mainTexture;
+        Show(false);
     }
 
     public async void OnMouseUpAsButton()

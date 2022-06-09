@@ -6,12 +6,15 @@ using UnityEngine.Networking;
 
 public class Help : MonoBehaviour
 {
-    List<string> works;
-
     public static Help Instance;
+
+    public Font chinese;
+    public Font english;
+
     Dictionary<string, AssetBundle> bundles;
     Dictionary<string, Color> colors;
 
+    List<string> works;
     string streamingAssetsPath => Application.streamingAssetsPath.Replace("lovelace/", "");
     private void Awake()
     {

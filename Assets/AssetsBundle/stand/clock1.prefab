@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2629457771911423082}
   - component: {fileID: 6725825780087008748}
   - component: {fileID: 3628508839351969605}
-  - component: {fileID: 8879957395467313138}
   m_Layer: 0
   m_Name: clock
   m_TagString: Untagged
@@ -52,7 +51,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9a484198ba157434499440b94f9f2c50, type: 3}
+  - {fileID: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -82,33 +81,20 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2612355848691925079}
-  m_Text: 23:26
+  m_Text: 
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
   m_Anchor: 4
   m_Alignment: 0
   m_TabSize: 4
-  m_FontSize: 28
+  m_FontSize: 26
   m_FontStyle: 0
   m_RichText: 1
-  m_Font: {fileID: 12800000, guid: 9a484198ba157434499440b94f9f2c50, type: 3}
+  m_Font: {fileID: 0}
   m_Color:
     serializedVersion: 2
     rgba: 4294967295
---- !u!114 &8879957395467313138
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2612355848691925079}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 962a107c269a3f746b8c84cefae34364, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  time: {fileID: 3628508839351969605}
 --- !u!1 &7355824458040033817
 GameObject:
   m_ObjectHideFlags: 0

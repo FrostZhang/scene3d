@@ -7,6 +7,12 @@ public class HouseClock : MonoBehaviour
 {
     public TextMesh time;
     int lastminute;
+    void Start()
+    {
+        time.font = Help.Instance.english;
+        time.GetComponent<MeshRenderer>().material = Help.Instance.english.material;
+    }
+
     void Update()
     {
         if (lastminute != DateTime.Now.Minute)

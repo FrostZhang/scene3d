@@ -13,6 +13,8 @@ public class TextEntity : HassEntity
     public string value = "?";
     void Start()
     {
+        textMesh.font = Help.Instance.chinese;
+        textMesh.GetComponent<MeshRenderer>().material = Help.Instance.chinese.material;
         mr.enabled = false;
         FlushText();
         editC.enabled = false;
