@@ -31,6 +31,37 @@ public class House : MonoBehaviour
         lis = new List<HassEntity>(100);
         homeassistantEntities = new List<string>(100);
         cureetHouse = new Dictionary<Transform, HouseEntityType>(200);
+
+        Thrid();
+    }
+
+    private async Task Thrid()
+    {
+        var path = Help.Instance.customdatapath + "/supplier.json";
+        var te = await Help.Instance.TextRequest(false, path, false);
+        if (te != null)
+        {
+            var jd = LitJson.JsonMapper.ToObject(te);
+            if (jd.IsArray)
+            {
+                jd.Foreach((cusname, jd) =>
+                {
+                    var dic = jd as IDictionary;
+                    if (dic.Contains("supplier"))
+                    {
+
+                    }
+                    if (dic.Contains("user"))
+                    {
+
+                    }
+                    if (dic.Contains("key"))
+                    {
+
+                    }
+                });
+            }
+        }
     }
 
     void Start()
@@ -297,9 +328,10 @@ public class House : MonoBehaviour
             -1, "255,0,252,255", "red", "");
         CreatStand("electricball", "-3.986,3.766,1.085,0,0,0,0.4,0.4,0.4", null);
         HouseWeather.Instance.CreatSky("space");
-        CreatAppliances("tv", "-1.56,-1.565,0.41,0,-90,0,0.7,0.7,0.7", "switch.xxx", null, null);
-        CreatAppliances("washer", "-1.68,-4.166,0,0,-90,0,1,1,1", "switch.xxx", null, null);
+        CreatAppliances("tv", "-1.56,-1.565,0.41,0,-90,0,0.7,0.7,0.7", "switch.xxx", null, null, null);
+        CreatAppliances("washer", "-1.68,-4.166,0,0,-90,0,1,1,1", "switch.xxx", null, null, null);
     }
+
     /// <summary>xywh </summary>
     public async Task<HassEntity> CreatAnim(string cusname, string str)
     {
@@ -312,8 +344,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ss[2], out va)) w = va; else return null;
         if (float.TryParse(ss[3], out va)) h = va; else return null;
 
-        await Help.Instance.ABLoad("animal", cusname);
-        var ab = Help.Instance.GetBundle("animal", cusname);
+        var ab = await Help.Instance.ABLoad("animal", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -329,7 +360,7 @@ public class House : MonoBehaviour
     }
 
     /// <summary>posxzy anglexyz scalexyz </summary>
-    public async Task<HassEntity> CreatAppliances(string cusname, string str, string id, string more, string color)
+    public async Task<HassEntity> CreatAppliances(string cusname, string str, string id, string more, string color, string supplier)
     {
         if (string.IsNullOrEmpty(str)) return null;
         var ss = str.Split(',');
@@ -345,7 +376,7 @@ public class House : MonoBehaviour
             if (float.TryParse(ss[6], out va)) sx = va; else return null;
             if (float.TryParse(ss[7], out va)) sy = va; else return null;
             if (float.TryParse(ss[8], out va)) sz = va; else return null;
-            var tr = await CreatAppliances(cusname, id);
+            var tr = await CreatAppliances(cusname, id, supplier);
             if (tr)
             {
                 tr.transform.position = new Vector3(x, z, y);
@@ -385,12 +416,25 @@ public class House : MonoBehaviour
         }
         return null;
     }
-    public async Task<HassEntity> CreatAppliances(string cusname, string id)
+
+    public async Task<HassEntity> CreatAppliances(string cusname, string id, string supplier)
     {
-        await Help.Instance.ABLoad("appliances", cusname);
-        var ab = Help.Instance.GetBundle("appliances", cusname);
-        if (ab == null) return null;
-        var tr = ab.LoadAsset<GameObject>(cusname);
+        GameObject tr = null;
+        if (string.IsNullOrEmpty(supplier))
+        {
+            var ab = await Help.Instance.ABLoad("appliances", cusname);
+            if (ab == null) return null;
+            tr = ab.LoadAsset<GameObject>(cusname);
+        }
+        else
+        {
+            var ab = await Help.Instance.ABLoad("appliances", cusname, supplier);
+            if (ab == null) return null;
+            tr = ab.LoadAsset<GameObject>(cusname);
+            tr.GetComponent<HassEntity>().Supplier = supplier;
+        }
+        if (!tr)
+            return null;
         tr = Instantiate(tr, parent);
         tr.name = cusname;
         var e = tr.GetComponent<HassEntity>();
@@ -437,8 +481,7 @@ public class House : MonoBehaviour
     /// <summary>posxzy anglexyz scalexyz </summary>
     public async Task<Transform> CreatStand(string cusname, string color)
     {
-        await Help.Instance.ABLoad("stand", cusname);
-        var ab = Help.Instance.GetBundle("stand", cusname);
+        var ab = await Help.Instance.ABLoad("stand", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -482,8 +525,7 @@ public class House : MonoBehaviour
 
     public async Task<Transform> CreatEye(string cusname)
     {
-        await Help.Instance.ABLoad("look", cusname);
-        var ab = Help.Instance.GetBundle("look", cusname);
+        var ab = await Help.Instance.ABLoad("look", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -496,8 +538,7 @@ public class House : MonoBehaviour
     {
         var vs = GetPoss(pos);
         if (vs == null) return null;
-        await Help.Instance.ABLoad("line", "flowline");
-        var ab = Help.Instance.GetBundle("line", "flowline");
+        var ab = await Help.Instance.ABLoad("line", "flowline");
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>("flowline");
         var lineE = Instantiate(tr, parent).GetComponent<LineEntity>();
@@ -564,8 +605,7 @@ public class House : MonoBehaviour
             if (float.TryParse(ss[8], out va)) sz = va; else return null;
             if (float.TryParse(ss[9], out va)) open = va; else return null;
 
-            await Help.Instance.ABLoad("door", cusname);
-            var ab = Help.Instance.GetBundle("door", cusname);
+            var ab = await Help.Instance.ABLoad("door", cusname);
             if (ab == null) return null;
             var tr = ab.LoadAsset<GameObject>(cusname);
             tr = Instantiate(tr, parent);
@@ -655,8 +695,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ss[4], out va)) tx = va; else return null;
         if (float.TryParse(ss[5], out va)) ty = va; else return null;
 
-        await Help.Instance.ABLoad("floor", cusname);
-        var ab = Help.Instance.GetBundle("floor", cusname);
+        var ab = await Help.Instance.ABLoad("floor", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -692,8 +731,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ws[5], out va)) h = va; else return null;
         if (float.TryParse(ws[6], out va)) t = va; else return null;
 
-        await Help.Instance.ABLoad("wall", cusname);
-        var ab = Help.Instance.GetBundle("wall", cusname);
+        var ab = await Help.Instance.ABLoad("wall", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         var cube = Instantiate(tr, parent);
@@ -866,7 +904,7 @@ public class House : MonoBehaviour
             var canshu = door[cusname];
             var dic = canshu as IDictionary;
             if (dic == null) return;
-            string pos = null, entity = null, color = null, more = null;
+            string pos = null, entity = null, color = null, more = null, supplier = null;
             if (dic.Contains("pos"))
                 pos = dic["pos"]?.ToString();
             if (dic.Contains("entity"))
@@ -875,7 +913,9 @@ public class House : MonoBehaviour
                 more = dic["more"]?.ToString();
             if (dic.Contains("color"))
                 color = dic["color"]?.ToString();
-            CreatAppliances(cusname, pos, entity, more, color);
+            if (dic.Contains("supplier"))
+                supplier = dic["supplier"]?.ToString();
+            CreatAppliances(cusname, pos, entity, more, color, supplier);
         });
     }
     private void AnsSky(JsonData jd)
@@ -1124,6 +1164,11 @@ public class House : MonoBehaviour
             writer.WritePropertyName("entity");
             var tr = item.GetComponent<HassEntity>();
             writer.Write(tr.Entity_id);
+            if (!string.IsNullOrWhiteSpace(tr.Supplier))
+            {
+                writer.WritePropertyName("supplier");
+                writer.Write(tr.Supplier);
+            }
             if (tr is AlarmEntity)
             {
                 var e = tr as AlarmEntity;

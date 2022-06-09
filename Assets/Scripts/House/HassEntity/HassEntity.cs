@@ -6,6 +6,7 @@ using UnityEngine;
 public class HassEntity : MonoBehaviour
 {
     public string Entity_id { get => entity_id; }
+    public string Supplier { get; set; }
     public Collider editC;
     protected string entity_id;
     //const string switchkey = "switch";//on off

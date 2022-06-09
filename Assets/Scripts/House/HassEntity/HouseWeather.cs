@@ -44,7 +44,7 @@ public class HouseWeather : HassEntity
         if (RenderSettings.skybox)
         {
             RenderSettings.skybox.SetFloat("_Exposure", 0.85f);
-            RenderSettings.skybox.SetColor("_Tint", Color.Lerp(new Color32(50,50,50,50), new Color32(200,200,200,200), v));
+            RenderSettings.skybox.SetColor("_Tint", Color.Lerp(new Color32(50, 50, 50, 50), new Color32(200, 200, 200, 200), v));
         }
     }
     public void SetRain(float value)
@@ -208,8 +208,7 @@ public class HouseWeather : HassEntity
     {
         if (string.IsNullOrWhiteSpace(str) || skyname == str) return;
         skyname = str;
-        await Help.Instance.ABLoad("sky", str);
-        var ab = Help.Instance.GetBundle("sky", str);
+        var ab = await Help.Instance.ABLoad("sky", str);
         if (ab)
         {
             var ma = ab.LoadAsset<Material>(str);
@@ -219,11 +218,10 @@ public class HouseWeather : HassEntity
         }
     }
 
-    IEnumerator LoadRain(string str)
+    async Task LoadRain(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        yield return Help.Instance.ABLoad("weather", str);
-        var ab = Help.Instance.GetBundle("weather", str);
+        var ab = await Help.Instance.ABLoad("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -231,16 +229,15 @@ public class HouseWeather : HassEntity
         if (!ps) goto err;
         rmain = ps;
         SetRain(0);
-        yield break;
+        return;
     err:
         Debug.LogError("‘ÿ»Î¥ÌŒÛ");
     }
 
-    IEnumerator LoadSnow(string str)
+    async Task LoadSnow(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        yield return Help.Instance.ABLoad("weather", str);
-        var ab = Help.Instance.GetBundle("weather", str);
+        var ab = await Help.Instance.ABLoad("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -248,16 +245,15 @@ public class HouseWeather : HassEntity
         if (!ps) goto err;
         smain = ps;
         SetSnow(0);
-        yield break;
+        return;
     err:
         Debug.LogError("‘ÿ»Î¥ÌŒÛ");
     }
 
-    IEnumerator LoadFog(string str)
+    async Task LoadFog(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        yield return Help.Instance.ABLoad("weather", str);
-        var ab = Help.Instance.GetBundle("weather", str);
+        var ab = await Help.Instance.ABLoad("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -265,16 +261,15 @@ public class HouseWeather : HassEntity
         if (!ps) goto err;
         fmain = ps;
         SetFog(0);
-        yield break;
+        return;
     err:
         Debug.LogError("‘ÿ»Î¥ÌŒÛ");
     }
 
-    IEnumerator LoadLighting(string str)
+    async Task LoadLighting(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        yield return Help.Instance.ABLoad("weather", str);
-        var ab = Help.Instance.GetBundle("weather", str);
+        var ab = await Help.Instance.ABLoad("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -282,7 +277,7 @@ public class HouseWeather : HassEntity
         if (!ps) goto err;
         lmain = ps;
         SetLighting(0);
-        yield break;
+        return;
     err:
         Debug.LogError("‘ÿ»Î¥ÌŒÛ");
     }

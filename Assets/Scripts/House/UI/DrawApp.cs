@@ -115,7 +115,7 @@ public class DrawApp : MonoBehaviour
     {
         var p = Input.mousePosition;
         p = Camera.main.ScreenToWorldPoint(p);
-        var wall = await House.Instance.CreatAppliances(choose.key, null);
+        var wall = await House.Instance.CreatAppliances(choose.key, null, null);
         p.y = 0;
         wall.transform.position = p;
         await new WaitForEndOfFrame();

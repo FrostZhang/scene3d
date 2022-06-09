@@ -15,9 +15,10 @@ public class CreatPanel : MonoBehaviour
         public string root;
         public string key;
         public string previewpath;
+        public string supplier;
         public override string ToString()
         {
-            return root + " " + key + " " + previewpath;
+            return supplier + " " + root + " " + key + " " + previewpath;
         }
     }
     void Awake()
@@ -97,5 +98,6 @@ public class CreatPanel : MonoBehaviour
                 });
             }
         }
+
     }
 }

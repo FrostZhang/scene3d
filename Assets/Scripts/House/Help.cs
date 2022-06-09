@@ -15,7 +15,9 @@ public class Help : MonoBehaviour
     Dictionary<string, Color> colors;
 
     List<string> works;
-    string streamingAssetsPath => Application.streamingAssetsPath.Replace("lovelace/", "");
+    public readonly string streamingAssetsPath = Shijie.domain + "/3dscene_local/StreamingAssets";
+    public readonly string customdatapath = Shijie.domain + "/3dscene_local/Customdata";
+
     private void Awake()
     {
         Instance = this;
@@ -34,21 +36,38 @@ public class Help : MonoBehaviour
         colors.Add("green", Color.green);
     }
 
-    public IEnumerator ABLoad(string root, string key)
+    public async Task<AssetBundle> ABLoad(string root, string key)
     {
         string dk = key + "_" + root + ".asherlinkdata";
         if (bundles.ContainsKey(dk))
         {
-            yield break;
+            return bundles[dk];
         }
         else if (works.Contains(dk))
         {
-            yield return new WaitUntil(() => bundles.ContainsKey(dk));
-            yield break;
+            await new WaitUntilAsync(() => bundles.ContainsKey(dk));
+            return bundles[dk];
         }
         var path = $"{streamingAssetsPath}/{root}/{dk}";
         System.Uri uri = new System.Uri(path);
-        yield return ABRequest(dk, uri);
+        return await ABRequest(dk, uri);
+    }
+
+    public async Task<AssetBundle> ABLoad(string root, string key, string supplier)
+    {
+        string dk = supplier + "_" + key + "_" + root + ".asherlinkdata";
+        if (bundles.ContainsKey(dk))
+        {
+            return bundles[dk];
+        }
+        else if (works.Contains(dk))
+        {
+            await new WaitUntilAsync(() => bundles.ContainsKey(dk));
+            return bundles[dk];
+        }
+        var path = $"{customdatapath}/{supplier}/{root}/{dk}";
+        System.Uri uri = new System.Uri(path);
+        return await ABRequest(dk, uri);
     }
 
     /// <summary>
@@ -64,12 +83,13 @@ public class Help : MonoBehaviour
         return null;
     }
 
-    IEnumerator ABRequest(string dk, System.Uri uri)
+    async Task<AssetBundle> ABRequest(string dk, System.Uri uri)
     {
+        AssetBundle res = null;
         works.Add(dk);
         using (var request = UnityWebRequestAssetBundle.GetAssetBundle(uri))
         {
-            yield return request.SendWebRequest();
+            await request.SendWebRequest();
             if (request.result != UnityWebRequest.Result.Success)
             {
                 bundles.Add(dk, null);
@@ -77,10 +97,13 @@ public class Help : MonoBehaviour
             }
             else
             {
-                bundles.Add(dk, DownloadHandlerAssetBundle.GetContent(request));
+                res = DownloadHandlerAssetBundle.GetContent(request);
+                if (res)
+                    bundles.Add(dk, res);
             }
         }
         works.Remove(dk);
+        return res;
     }
 
     public async Task<Texture2D> TextureRequest(bool isstreamingAssets, string path)
@@ -112,6 +135,7 @@ public class Help : MonoBehaviour
     public async Task<string> TextRequest(bool isstreamingAssets, string path, bool cache = true)
     {
         System.Uri uri;
+        string res = null;
         if (isstreamingAssets)
         {
             uri = new System.Uri(streamingAssetsPath + "/" + path);
@@ -137,18 +161,14 @@ public class Help : MonoBehaviour
             }
             else
             {
-                await new WaitUntil(() => request.isDone);
+                await new WaitUntilAsync(() => request.isDone);
                 if (request.downloadHandler != null)
                 {
-                    return request.downloadHandler.text;
-                }
-                else
-                {
-                    return null;
+                    res = request.downloadHandler.text;
                 }
             }
         }
-        return null;
+        return res;
     }
 
     public bool TryColor(string cstr, out Color va)
