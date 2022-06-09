@@ -138,7 +138,7 @@ public class Reconstitution : MonoBehaviour
 
     public void EditLine(LineEntity e, Action<Color> onchangeC, Action Ondel)
     {
-        CameraControllerForUnity.Instance.canUseMouseCenter = false;
+        //CameraControllerForUnity.Instance.canUseMouseCenter = false;
         ClearHandle();
         PropPanle.Instance.Clear();
         var l = e.line;

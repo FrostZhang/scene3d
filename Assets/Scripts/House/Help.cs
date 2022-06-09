@@ -15,8 +15,14 @@ public class Help : MonoBehaviour
     Dictionary<string, Color> colors;
 
     List<string> works;
+
+#if UNITY_EDITOR || UNITY_STANDALONE
+    public readonly string streamingAssetsPath = Application.streamingAssetsPath;
+    public readonly string customdatapath = Application.streamingAssetsPath + "/Customdata";
+#elif UNITY_WEBGL
     public readonly string streamingAssetsPath = Shijie.domain + "/3dscene_local/StreamingAssets";
     public readonly string customdatapath = Shijie.domain + "/3dscene_local/Customdata";
+#endif
 
     private void Awake()
     {
