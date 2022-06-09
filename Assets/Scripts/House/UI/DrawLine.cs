@@ -8,6 +8,8 @@ public class DrawLine : MonoBehaviour
     public Toggle prefab;
     List<Toggle> tos;
     public Button add;
+
+    static Toggle currentTo;
     void Start()
     {
         prefab.gameObject.SetActive(false);
@@ -16,6 +18,15 @@ public class DrawLine : MonoBehaviour
             var e = await House.Instance.CreatFlowLine("0,0,0.1,2,0,0.1", -1, "255,255,255,255", "255,255,255,255", null);
             ShowLine(e);
         });
+    }
+
+    private void Ondel()
+    {
+        if (currentTo)
+        {
+            tos.Remove(currentTo);
+            Destroy(currentTo.gameObject);
+        }
     }
 
     private void ShowLine(LineEntity e)
@@ -33,11 +44,8 @@ public class DrawLine : MonoBehaviour
             {
                 if (x)
                 {
-                    Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; }, () =>
-                    {
-                        tos.Remove(to);
-                        Destroy(to.gameObject);
-                    });
+                    currentTo = to;
+                    Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
                 }
                 else
                 {
@@ -52,20 +60,12 @@ public class DrawLine : MonoBehaviour
                 l.positionCount = a + 1;
                 var p = l.GetPosition(a - 1);
                 l.SetPosition(a, p + Vector3.right);
-                Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; }, () =>
-                {
-                    tos.Remove(to);
-                    Destroy(to.gameObject);
-                });
+                Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
             });
             del.GetComponent<Button>().onClick.AddListener(() =>
             {
                 l.positionCount -= 1;
-                Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; }, () =>
-                {
-                    tos.Remove(to);
-                    Destroy(to.gameObject);
-                });
+                Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
             });
             //to.isOn = true;
         }
@@ -83,6 +83,17 @@ public class DrawLine : MonoBehaviour
                 ShowLine(e);
             }
         }
+        PropPanle.Instance.Ondel += Ondel;
+        Reconstitution.Instance.ChangeEditorTarget += ChangeEditorTarget;
+    }
+
+    private void ChangeEditorTarget(Transform obj)
+    {
+        if (currentTo)
+        {
+            currentTo.isOn = false;
+            currentTo = null;
+        }
     }
 
     void OnDisable()
@@ -93,6 +104,9 @@ public class DrawLine : MonoBehaviour
             Destroy(item.gameObject);
         }
         tos.Clear();
+        currentTo = null;
+        PropPanle.Instance.Ondel -= Ondel;
+        Reconstitution.Instance.ChangeEditorTarget -= ChangeEditorTarget;
     }
 
 }

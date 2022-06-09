@@ -8,24 +8,14 @@ public class Reconstitution : MonoBehaviour
 {
     public static Reconstitution Instance;
     public bool IsEdit { get => isEdit; }
+    public Action<Transform> ChangeEditorTarget;
     private bool isEdit;
     Camera mainCa;
-    //Transform caTr;
     Transform rigTr;
     Transform cs;
     private RaycastHit hit;
     private float maxDistance = 25;
     private Transform lasthit;
-    //Outline lastO;
-    Vector3 lastmousePos, lastTrpos;
-    bool drag;
-    public Color lineColor = new Color(1, 1, 1, 0.5f);
-    public Material lineMat;
-    public LineRenderer lineW;
-    public TextMesh linewTe;
-    public LineRenderer lineH;
-    public TextMesh linehTe;
-
     CHHandle chhadle;
     List<RTEditor.Gizmo> ligizmo;
     Vector3 offset = new Vector3(1, 0, 1) * 0.125f;
@@ -38,7 +28,7 @@ public class Reconstitution : MonoBehaviour
         //caTr = mainCa.transform;
         rigTr = CameraControllerForUnity.Instance.transform;
         ligizmo = new List<RTEditor.Gizmo>(5);
-        PropPanle.Instance.Ondel = OnDelete;
+        PropPanle.Instance.Ondel += OnDelete;
     }
 
     private void OnDelete()
@@ -49,17 +39,6 @@ public class Reconstitution : MonoBehaviour
         PropPanle.Instance.Show(false);
         lasthit = null;
     }
-
-    private void VolumeScaleGizmo_GizmoDragUpdate(RTEditor.Gizmo gizmo)
-    {
-        FlushPropPanle();
-    }
-
-    private void TranslationGizmo_GizmoDragUpdate(RTEditor.Gizmo gizmo)
-    {
-        FlushPropPanle();
-    }
-
 
     public void OpenRTEditor()
     {
@@ -136,70 +115,6 @@ public class Reconstitution : MonoBehaviour
 
     }
 
-    public void EditLine(LineEntity e, Action<Color> onchangeC, Action Ondel)
-    {
-        //CameraControllerForUnity.Instance.canUseMouseCenter = false;
-        ClearHandle();
-        PropPanle.Instance.Clear();
-        var l = e.line;
-        for (int i = 0; i < l.positionCount; i++)
-        {
-            var n = i;
-            var p = l.GetPosition(n);
-            var m = chhadle.PositionHandle(p, Quaternion.identity, (x) =>
-             {
-                 var pn = l.GetPosition(n);
-                 pn += x;
-                 l.SetPosition(n, pn);
-                 PropPanle.Instance.Flush(new int[] { n * 3, n * 3 + 1, n * 3 + 2 }, pn.x, pn.z, pn.y);
-             });
-            m.MultiAxisSquareSize = 0;
-            m.AxisLength = 1;
-            m.SetAxisVisibility(false, 1);
-            ligizmo.Add(m);
-            PropPanle.Instance.GetV3(n.ToString(), p.x, p.z, p.y, (x) =>
-            {
-                var pn = l.GetPosition(n);
-                pn.x = x;
-                l.SetPosition(n, pn);
-                m.transform.position = pn;
-            }, (y) =>
-            {
-                var pn = l.GetPosition(n);
-                pn.z = y;
-                l.SetPosition(n, pn);
-                m.transform.position = pn;
-            }, (z) =>
-            {
-                var pn = l.GetPosition(n);
-                pn.y = z;
-                l.SetPosition(n, pn);
-                m.transform.position = pn;
-            });
-        }
-        PropPanle.Instance.GetColor("on", e.Oncolor, (x) =>
-        {
-            e.SetOnc(x);
-            onchangeC?.Invoke(x);
-        });
-        PropPanle.Instance.GetColor("off", e.Offcolor, (x) =>
-        {
-            e.SetOffc(x);
-        });
-        lasthit = l.transform;
-        PropPanle.Instance.GetEntity("Entity", e.Entity_id, (x) =>
-        {
-            e.SetEntity(x);
-        });
-        Action action = null;
-        action = () =>
-       {
-           PropPanle.Instance.Ondel -= action;
-           Ondel?.Invoke();
-       };
-        PropPanle.Instance.Ondel += action;
-        PropPanle.Instance.Show(true);
-    }
 
     RaycastHit[] jiances;
     float interval;
@@ -257,12 +172,14 @@ public class Reconstitution : MonoBehaviour
 
     private void SelectTr(Transform lasthit)
     {
+        ChangeEditorTarget?.Invoke(lasthit);
         var h = chhadle.PositionHandle(lasthit.position + offset, Quaternion.identity, (x) =>
              {
                  lasthit.position += x;
                  FlushPropPanle();
              });
         h.SetAxisVisibility(false, 1);
+        h.AxisLength = 2.5f;
         ligizmo.Add(h);
         var s = chhadle.VolumeHandle(lasthit.gameObject, (a, b) =>
          {
@@ -755,6 +672,67 @@ public class Reconstitution : MonoBehaviour
         });
         var r = target.GetComponent<MeshRenderer>().material;
         PropPanle.Instance.GetColor("Color", r.color, (x) => r.color = x);
+        PropPanle.Instance.Show(true);
+    }
+
+    /// <summary>
+    /// 由于线条不可选中，所以采用点击UI列表展示
+    /// </summary>
+    public void EditLine(LineEntity e, Action<Color> onchangeC)
+    {
+        //CameraControllerForUnity.Instance.canUseMouseCenter = false;
+        ClearHandle();
+        PropPanle.Instance.Clear();
+        var l = e.line;
+        for (int i = 0; i < l.positionCount; i++)
+        {
+            var n = i;
+            var p = l.GetPosition(n);
+            var m = chhadle.PositionHandle(p, Quaternion.identity, (x) =>
+            {
+                var pn = l.GetPosition(n);
+                pn += x;
+                l.SetPosition(n, pn);
+                PropPanle.Instance.Flush(new int[] { n * 3, n * 3 + 1, n * 3 + 2 }, pn.x, pn.z, pn.y);
+            });
+            m.MultiAxisSquareSize = 0;
+            m.AxisLength = 1;
+            m.SetAxisVisibility(false, 1);
+            ligizmo.Add(m);
+            PropPanle.Instance.GetV3(n.ToString(), p.x, p.z, p.y, (x) =>
+            {
+                var pn = l.GetPosition(n);
+                pn.x = x;
+                l.SetPosition(n, pn);
+                m.transform.position = pn;
+            }, (y) =>
+            {
+                var pn = l.GetPosition(n);
+                pn.z = y;
+                l.SetPosition(n, pn);
+                m.transform.position = pn;
+            }, (z) =>
+            {
+                var pn = l.GetPosition(n);
+                pn.y = z;
+                l.SetPosition(n, pn);
+                m.transform.position = pn;
+            });
+        }
+        PropPanle.Instance.GetColor("on", e.Oncolor, (x) =>
+        {
+            e.SetOnc(x);
+            onchangeC?.Invoke(x);
+        });
+        PropPanle.Instance.GetColor("off", e.Offcolor, (x) =>
+        {
+            e.SetOffc(x);
+        });
+        lasthit = l.transform;
+        PropPanle.Instance.GetEntity("Entity", e.Entity_id, (x) =>
+        {
+            e.SetEntity(x);
+        });
         PropPanle.Instance.Show(true);
     }
 
