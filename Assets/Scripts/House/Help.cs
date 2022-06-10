@@ -16,13 +16,8 @@ public class Help : MonoBehaviour
 
     List<string> works;
 
-#if UNITY_EDITOR || UNITY_STANDALONE
-    public readonly string streamingAssetsPath = Application.streamingAssetsPath;
-    public readonly string customdatapath = Application.streamingAssetsPath + "/Customdata";
-#elif UNITY_WEBGL
-    public readonly string streamingAssetsPath = Shijie.domain + "/3dscene_local/StreamingAssets";
-    public readonly string customdatapath = Shijie.domain + "/3dscene_local/Customdata";
-#endif
+    public string streamingAssetsPath = Application.streamingAssetsPath;
+    public string customdatapath = Application.streamingAssetsPath + "/Customdata";
 
     private void Awake()
     {
@@ -40,6 +35,12 @@ public class Help : MonoBehaviour
         colors.Add("white", Color.white);
         colors.Add("blue", Color.blue);
         colors.Add("green", Color.green);
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        streamingAssetsPath = Shijie.domain + "/3dscene_local/StreamingAssets";
+        customdatapath = Shijie.domain + "/3dscene_local/Customdata";
+#endif
+
     }
 
     public async Task<AssetBundle> ABLoad(string root, string key)

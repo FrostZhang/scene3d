@@ -28,7 +28,6 @@ public class LampEntity : HassEntity
         c.g *= 2;
         c.b *= 2;
         mr.material.SetColor("_EmissionColor", c);
-        Debug.Log(emColor);
     }
 
     protected override void TrunOff()

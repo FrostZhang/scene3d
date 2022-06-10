@@ -2980,12 +2980,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e39e0459073f6414195c3b3fe53e5a72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lineColor: {r: 1, g: 1, b: 1, a: 0.5}
-  lineMat: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
-  lineW: {fileID: 429579976}
-  linewTe: {fileID: 1102487778}
-  lineH: {fileID: 592266098}
-  linehTe: {fileID: 1267207570}
 --- !u!4 &2054746849
 Transform:
   m_ObjectHideFlags: 0
@@ -3032,6 +3026,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chinese: {fileID: 12800000, guid: 0290e5a1d1dcbe44bb774e1efa613c3e, type: 3}
   english: {fileID: 12800000, guid: 9a484198ba157434499440b94f9f2c50, type: 3}
+  streamingAssetsPath: D:/Document/scene3d/Assets/StreamingAssets
+  customdatapath: D:/Document/scene3d/Assets/StreamingAssets/Customdata
 --- !u!114 &2054746852
 MonoBehaviour:
   m_ObjectHideFlags: 0

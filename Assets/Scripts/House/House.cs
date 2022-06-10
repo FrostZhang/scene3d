@@ -31,11 +31,49 @@ public class House : MonoBehaviour
         lis = new List<HassEntity>(100);
         homeassistantEntities = new List<string>(100);
         cureetHouse = new Dictionary<Transform, HouseEntityType>(200);
-
-        Thrid();
     }
 
-    private async Task Thrid()
+
+    void Start()
+    {
+        var t = Resources.Load<Transform>("UI/SouquanPanel");
+        Instantiate(t, canvas);
+        t = Resources.Load<Transform>("UI/DashangPanel");
+        Instantiate(t, canvas);
+        Shijie.OnGetConfig += OnGetConfig;
+        Shijie.OnHassFlush += OnHassFlush;
+#if UNITY_WEBGL && !UNITY_EDITOR
+        Shijie.Link3DStart();
+        WebGLInput.captureAllKeyboardInput = false;
+#endif
+
+#if UNITY_EDITOR
+        Test();
+#else
+    ReadCustomConfig();
+#endif
+        LoadThrid();
+
+    }
+
+    private async void ReadCustomConfig()
+    {
+        var te = await Help.Instance.TextRequest(false, Shijie.domain + "/3dscene_local/Customdata/houseconnfig.json", false);
+        if (te != null)
+        {
+            if (te.StartsWith(""))
+                te = te.TrimStart('\"').TrimEnd('\"');
+            te = te.Replace("None", "null");
+            OnGetConfig(te);
+        }
+        else
+        {
+            CreatFloor("groud1", "0,0,10,10,1,1", 0, null);
+            CreatAppliances("text", "0,0,0.5,90,0,0,2,0.6,0.6", "", "hello , Welcome home", "yellow", null);
+        }
+    }
+
+    private async Task LoadThrid()
     {
         var path = Help.Instance.customdatapath + "/supplier.json";
         var te = await Help.Instance.TextRequest(false, path, false);
@@ -61,38 +99,6 @@ public class House : MonoBehaviour
                     }
                 });
             }
-        }
-    }
-
-    void Start()
-    {
-        var t = Resources.Load<Transform>("UI/SouquanPanel");
-        Instantiate(t, canvas);
-        t = Resources.Load<Transform>("UI/DashangPanel");
-        Instantiate(t, canvas);
-        Shijie.OnGetConfig += OnGetConfig;
-        Shijie.OnHassFlush += OnHassFlush;
-#if UNITY_WEBGL && !UNITY_EDITOR
-        Shijie.Link3DStart();
-        WebGLInput.captureAllKeyboardInput = false;
-#endif
-
-#if UNITY_EDITOR
-        Test();
-#else
-    ReadCustomConfig();
-#endif
-    }
-
-    private async void ReadCustomConfig()
-    {
-        var te = await Help.Instance.TextRequest(false, Shijie.domain + "/3dscene_local/Customdata/houseconnfig.json", false);
-        if (te != null)
-        {
-            if (te.StartsWith(""))
-                te = te.TrimStart('\"').TrimEnd('\"');
-            te = te.Replace("None", "null");
-            OnGetConfig(te);
         }
     }
 

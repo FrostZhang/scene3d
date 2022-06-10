@@ -401,8 +401,8 @@ public class CameraControllerForUnity : MonoBehaviour
             }
             else if (mode == Mode.first)
             {
-                xAngle += mousex * xspeed;
-                yAngle -= mousey * yspeed;
+                xAngle -= mousex * xspeed;
+                yAngle += mousey * yspeed;
                 yAngle = Mathf.Clamp(yAngle, firstLimitAngleY.x, firstLimitAngleY.y);
             }
         }
@@ -429,8 +429,8 @@ public class CameraControllerForUnity : MonoBehaviour
             }
             else if (mode == Mode.first)
             {
-                xAngle += mousex * xspeed;
-                yAngle -= mousey * yspeed;
+                xAngle -= mousex * xspeed;
+                yAngle += mousey * yspeed;
                 yAngle = Mathf.Clamp(yAngle, firstLimitAngleY.x, firstLimitAngleY.y);
             }
         }

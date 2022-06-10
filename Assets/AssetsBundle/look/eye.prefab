@@ -88,7 +88,7 @@ TextMesh:
   m_Anchor: 1
   m_Alignment: 0
   m_TabSize: 4
-  m_FontSize: 17
+  m_FontSize: 1
   m_FontStyle: 0
   m_RichText: 1
   m_Font: {fileID: 0}
