@@ -40,10 +40,9 @@ public class Help : MonoBehaviour
         streamingAssetsPath = Shijie.domain + "/3dscene_local/StreamingAssets";
         customdatapath = Shijie.domain + "/3dscene_local/Customdata";
 #endif
-
     }
 
-    public async Task<AssetBundle> ABLoad(string root, string key)
+    public async Task<AssetBundle> ABLoadlocal(string root, string key)
     {
         string dk = key + "_" + root + ".asherlinkdata";
         if (bundles.ContainsKey(dk))
@@ -60,34 +59,22 @@ public class Help : MonoBehaviour
         return await ABRequest(dk, uri);
     }
 
-    public async Task<AssetBundle> ABLoad(string root, string key, string supplier)
+    public async Task<AssetBundle> ABLoadsupplier(string root, string key, string supplier)
     {
-        string dk = supplier + "_" + key + "_" + root + ".asherlinkdata";
-        if (bundles.ContainsKey(dk))
+        string dickey = supplier + "_" + key + "_" + root + ".asherlinkdata";
+        string dk = key + "_" + root + ".asherlinkdata";
+        if (bundles.ContainsKey(dickey))
         {
-            return bundles[dk];
+            return bundles[dickey];
         }
-        else if (works.Contains(dk))
+        else if (works.Contains(dickey))
         {
-            await new WaitUntilAsync(() => bundles.ContainsKey(dk));
-            return bundles[dk];
+            await new WaitUntilAsync(() => bundles.ContainsKey(dickey));
+            return bundles[dickey];
         }
         var path = $"{customdatapath}/{supplier}/{root}/{dk}";
         System.Uri uri = new System.Uri(path);
         return await ABRequest(dk, uri);
-    }
-
-    /// <summary>
-    /// 在获取bundle前最好 ABLoad！
-    /// </summary>
-    public AssetBundle GetBundle(string root, string key)
-    {
-        string dk = key + "_" + root + ".asherlinkdata";
-        if (bundles.ContainsKey(dk))
-        {
-            return bundles[dk];
-        }
-        return null;
     }
 
     async Task<AssetBundle> ABRequest(string dk, System.Uri uri)
@@ -113,7 +100,7 @@ public class Help : MonoBehaviour
         return res;
     }
 
-    public async Task<Texture2D> TextureRequest(bool isstreamingAssets, string path)
+    public async Task<Texture2D> TextureRequestlocal(bool isstreamingAssets, string path)
     {
         System.Uri uri;
         if (isstreamingAssets)
@@ -122,14 +109,14 @@ public class Help : MonoBehaviour
         }
         else
         {
-            uri = new System.Uri(path);
+            uri = new System.Uri(customdatapath + "/" + path);
         }
         using (var request = UnityWebRequestTexture.GetTexture(uri))
         {
             await request.SendWebRequest();
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("找不到地址:" + path);
+                Debug.LogError("找不到地址:" + uri);
             }
             else
             {
@@ -139,7 +126,7 @@ public class Help : MonoBehaviour
         return null;
     }
 
-    public async Task<string> TextRequest(bool isstreamingAssets, string path, bool cache = true)
+    public async Task<string> TextRequestlocal(bool isstreamingAssets, string path, bool cache = true)
     {
         System.Uri uri;
         string res = null;
@@ -149,7 +136,7 @@ public class Help : MonoBehaviour
         }
         else
         {
-            uri = new System.Uri(path);
+            uri = new System.Uri(customdatapath + "/" + path);
         }
         using (var request = new UnityWebRequest(uri))
         {

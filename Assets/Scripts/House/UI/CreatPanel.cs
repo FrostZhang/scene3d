@@ -24,11 +24,12 @@ public class CreatPanel : MonoBehaviour
     void Awake()
     {
         Instance = this;
+        zdic = new Dictionary<string, List<Ziyuan>>(200);
     }
 
     void Start()
     {
-        AnsJson();
+        AnsLocalResource();
         icon.gameObject.SetActive(false);
         var bs = btns.GetComponentsInChildren<Button>();
         for (int i = 0; i < bs.Length; i++)
@@ -57,12 +58,11 @@ public class CreatPanel : MonoBehaviour
         gameObject.SetActive(b);
     }
 
-    private async Task AnsJson()
+    private async Task AnsLocalResource()
     {
-        var te = await Help.Instance.TextRequest(true, "3dscene.json", false);
+        var te = await Help.Instance.TextRequestlocal(true, "3dscene.json", false);
         if (te != null)
         {
-            zdic = new Dictionary<string, List<Ziyuan>>(200);
             var jd = LitJson.JsonMapper.ToObject(te);
             if (jd.IsArray)
             {
@@ -99,5 +99,68 @@ public class CreatPanel : MonoBehaviour
             }
         }
 
+        te = await Help.Instance.TextRequestlocal(false, "supplier.json", false);
+        if (te != null)
+        {
+            var jd = LitJson.JsonMapper.ToObject(te);
+            if (jd.IsArray)
+            {
+                jd.Foreach((cusname, jd) =>
+                {
+                    var dic = jd as IDictionary;
+                    if (dic.Contains("supplier"))
+                    {
+                        var supplier = dic["supplier"]?.ToString();
+                        if (supplier != null)
+                        {
+                            AnsSupplierResource(supplier).WrapErrors();
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private async Task AnsSupplierResource(string supplier)
+    {
+        var te = await Help.Instance.TextRequestlocal(false, supplier + "/3dscene.json", false);
+        if (te != null)
+        {
+            var jd = LitJson.JsonMapper.ToObject(te);
+            if (jd.IsArray)
+            {
+                jd.Foreach((cusname, jd) =>
+                {
+                    var dic = jd as IDictionary;
+                    if (dic.Contains("datapath"))
+                    {
+                        Ziyuan ziyuan = new Ziyuan();
+                        var d = dic["datapath"]?.ToString();
+                        if (!string.IsNullOrEmpty(d))
+                        {
+                            d = d.Substring(d.IndexOf('/') + 1);
+                            d = d.Remove(d.IndexOf('.'));
+                            var ds = d.Split('_');
+                            ziyuan.key = ds[0];
+                            ziyuan.root = ds[1];
+                            ziyuan.supplier = supplier;
+                            if (zdic.ContainsKey(ziyuan.root))
+                            {
+                                zdic[ziyuan.root].Add(ziyuan);
+                            }
+                            else
+                            {
+                                zdic.Add(ziyuan.root, new List<Ziyuan>() { ziyuan });
+                            }
+                        }
+                        if (dic.Contains("previewpath"))
+                        {
+                            var p = dic["previewpath"];
+                            ziyuan.previewpath = p?.ToString();
+                        }
+                    }
+                });
+            }
+        }
     }
 }

@@ -52,13 +52,11 @@ public class House : MonoBehaviour
 #else
     ReadCustomConfig();
 #endif
-        LoadThrid();
-
     }
 
     private async void ReadCustomConfig()
     {
-        var te = await Help.Instance.TextRequest(false, Shijie.domain + "/3dscene_local/Customdata/houseconnfig.json", false);
+        var te = await Help.Instance.TextRequestlocal(false, Shijie.domain + "/3dscene_local/Customdata/houseconnfig.json", false);
         if (te != null)
         {
             if (te.StartsWith(""))
@@ -73,38 +71,9 @@ public class House : MonoBehaviour
         }
     }
 
-    private async Task LoadThrid()
-    {
-        var path = Help.Instance.customdatapath + "/supplier.json";
-        var te = await Help.Instance.TextRequest(false, path, false);
-        if (te != null)
-        {
-            var jd = LitJson.JsonMapper.ToObject(te);
-            if (jd.IsArray)
-            {
-                jd.Foreach((cusname, jd) =>
-                {
-                    var dic = jd as IDictionary;
-                    if (dic.Contains("supplier"))
-                    {
-
-                    }
-                    if (dic.Contains("user"))
-                    {
-
-                    }
-                    if (dic.Contains("key"))
-                    {
-
-                    }
-                });
-            }
-        }
-    }
-
     private async void Test()
     {
-        var te = await Help.Instance.TextRequest(true, "Customdata/houseconnfig.json");
+        var te = await Help.Instance.TextRequestlocal(true, "Customdata/houseconnfig.json");
         if (te != null)
         {
             if (te.StartsWith(""))
@@ -350,7 +319,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ss[2], out va)) w = va; else return null;
         if (float.TryParse(ss[3], out va)) h = va; else return null;
 
-        var ab = await Help.Instance.ABLoad("animal", cusname);
+        var ab = await Help.Instance.ABLoadlocal("animal", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -428,16 +397,15 @@ public class House : MonoBehaviour
         GameObject tr = null;
         if (string.IsNullOrEmpty(supplier))
         {
-            var ab = await Help.Instance.ABLoad("appliances", cusname);
+            var ab = await Help.Instance.ABLoadlocal("appliances", cusname);
             if (ab == null) return null;
             tr = ab.LoadAsset<GameObject>(cusname);
         }
         else
         {
-            var ab = await Help.Instance.ABLoad("appliances", cusname, supplier);
+            var ab = await Help.Instance.ABLoadsupplier("appliances", cusname, supplier);
             if (ab == null) return null;
             tr = ab.LoadAsset<GameObject>(cusname);
-            tr.GetComponent<HassEntity>().Supplier = supplier;
         }
         if (!tr)
             return null;
@@ -446,6 +414,7 @@ public class House : MonoBehaviour
         var e = tr.GetComponent<HassEntity>();
         if (e)
         {
+            e.Supplier = supplier;
             if (!string.IsNullOrWhiteSpace(id))
             {
                 e.SetEntity(id);
@@ -487,7 +456,7 @@ public class House : MonoBehaviour
     /// <summary>posxzy anglexyz scalexyz </summary>
     public async Task<Transform> CreatStand(string cusname, string color)
     {
-        var ab = await Help.Instance.ABLoad("stand", cusname);
+        var ab = await Help.Instance.ABLoadlocal("stand", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -531,7 +500,7 @@ public class House : MonoBehaviour
 
     public async Task<Transform> CreatEye(string cusname)
     {
-        var ab = await Help.Instance.ABLoad("look", cusname);
+        var ab = await Help.Instance.ABLoadlocal("look", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -544,7 +513,7 @@ public class House : MonoBehaviour
     {
         var vs = GetPoss(pos);
         if (vs == null) return null;
-        var ab = await Help.Instance.ABLoad("line", "flowline");
+        var ab = await Help.Instance.ABLoadlocal("line", "flowline");
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>("flowline");
         var lineE = Instantiate(tr, parent).GetComponent<LineEntity>();
@@ -611,7 +580,7 @@ public class House : MonoBehaviour
             if (float.TryParse(ss[8], out va)) sz = va; else return null;
             if (float.TryParse(ss[9], out va)) open = va; else return null;
 
-            var ab = await Help.Instance.ABLoad("door", cusname);
+            var ab = await Help.Instance.ABLoadlocal("door", cusname);
             if (ab == null) return null;
             var tr = ab.LoadAsset<GameObject>(cusname);
             tr = Instantiate(tr, parent);
@@ -701,7 +670,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ss[4], out va)) tx = va; else return null;
         if (float.TryParse(ss[5], out va)) ty = va; else return null;
 
-        var ab = await Help.Instance.ABLoad("floor", cusname);
+        var ab = await Help.Instance.ABLoadlocal("floor", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -737,7 +706,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ws[5], out va)) h = va; else return null;
         if (float.TryParse(ws[6], out va)) t = va; else return null;
 
-        var ab = await Help.Instance.ABLoad("wall", cusname);
+        var ab = await Help.Instance.ABLoadlocal("wall", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         var cube = Instantiate(tr, parent);
@@ -1335,14 +1304,5 @@ public class House : MonoBehaviour
             writer.WriteObjectEnd();
         }
         writer.WriteArrayEnd();
-    }
-}
-
-public class HouseConfigData
-{
-    public class Wall
-    {
-        public string chicun;
-        public string color;
     }
 }

@@ -19,7 +19,7 @@ public class HassEntity : MonoBehaviour
     //const string fan = "fan"; //on off
     const string on = "on";
     const string off = "off";
-    const string undefine = "undefine";
+    protected const string undefine = "undefine";
 
     string head;
     const string cmdon = "turn_on";

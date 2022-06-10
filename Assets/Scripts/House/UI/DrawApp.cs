@@ -69,10 +69,10 @@ public class DrawApp : MonoBehaviour
     }
     void Start()
     {
-        Ini();
+        LoadPrefab();
     }
 
-    async void Ini()
+    async void LoadPrefab()
     {
         await new WaitUntilAsync(() => CreatPanel.Instance.zdic != null);
         var dic = CreatPanel.Instance.zdic;
@@ -83,7 +83,11 @@ public class DrawApp : MonoBehaviour
             for (int i = 0; i < fs.Count; i++)
             {
                 var f = fs[i];
-                var te = await Help.Instance.TextureRequest(true, f.previewpath);
+                Texture2D te = null;
+                if (f.supplier != null)
+                    te = await Help.Instance.TextureRequestlocal(false, f.supplier + "/" + f.previewpath);
+                else
+                    te = await Help.Instance.TextureRequestlocal(true, f.previewpath);
                 if (!te) continue;
                 var index = i % prefabs.Count;
                 var p = Instantiate(prefabs[index], prefabs[index].parent);
@@ -115,7 +119,7 @@ public class DrawApp : MonoBehaviour
     {
         var p = Input.mousePosition;
         p = Camera.main.ScreenToWorldPoint(p);
-        var wall = await House.Instance.CreatAppliances(choose.key, null, null);
+        var wall = await House.Instance.CreatAppliances(choose.key, null, choose.supplier);
         p.y = 0;
         wall.transform.position = p;
         await new WaitForEndOfFrame();

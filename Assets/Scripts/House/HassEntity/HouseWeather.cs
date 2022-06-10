@@ -208,7 +208,7 @@ public class HouseWeather : HassEntity
     {
         if (string.IsNullOrWhiteSpace(str) || skyname == str) return;
         skyname = str;
-        var ab = await Help.Instance.ABLoad("sky", str);
+        var ab = await Help.Instance.ABLoadlocal("sky", str);
         if (ab)
         {
             var ma = ab.LoadAsset<Material>(str);
@@ -221,7 +221,7 @@ public class HouseWeather : HassEntity
     async Task LoadRain(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        var ab = await Help.Instance.ABLoad("weather", str);
+        var ab = await Help.Instance.ABLoadlocal("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -237,7 +237,7 @@ public class HouseWeather : HassEntity
     async Task LoadSnow(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        var ab = await Help.Instance.ABLoad("weather", str);
+        var ab = await Help.Instance.ABLoadlocal("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -253,7 +253,7 @@ public class HouseWeather : HassEntity
     async Task LoadFog(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        var ab = await Help.Instance.ABLoad("weather", str);
+        var ab = await Help.Instance.ABLoadlocal("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -269,7 +269,7 @@ public class HouseWeather : HassEntity
     async Task LoadLighting(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        var ab = await Help.Instance.ABLoad("weather", str);
+        var ab = await Help.Instance.ABLoadlocal("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;

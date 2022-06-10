@@ -83,7 +83,7 @@ public class DrawStand : MonoBehaviour
             for (int i = 0; i < fs.Count; i++)
             {
                 var f = fs[i];
-                var te = await Help.Instance.TextureRequest(true, f.previewpath);
+                var te = await Help.Instance.TextureRequestlocal(true, f.previewpath);
                 if (!te) continue;
                 var index = i % prefabs.Count;
                 var p = Instantiate(prefabs[index], prefabs[index].parent);
