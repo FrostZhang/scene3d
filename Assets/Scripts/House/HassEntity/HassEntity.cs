@@ -5,27 +5,29 @@ using UnityEngine;
 
 public class HassEntity : MonoBehaviour
 {
-    public string Entity_id { get => entity_id; }
-    public string Supplier { get; set; }
-    public Collider editC;
+    public string Entity_id { get => entity_id; } //homeassitant entity ID
+    public string Supplier { get; set; } //资源来源，当为null由本软件开发者提供
+    public string Url { get; set; }
+    public Collider editC;  //交互体
     protected string entity_id;
-    //const string switchkey = "switch";//on off
-    //const string lightkey = "light";  //on off
-    //const string climate = "climate"; // on off
-    //const string binary_sensor = "binary_sensor"; //on off
-    //const string media_player = "media_player"; //idle
-    //const string person = "person"; //not_home
-    //const string cover = "cover"; //窗帘 closed closing open opening
-    //const string fan = "fan"; //on off
-    const string on = "on";
-    const string off = "off";
-    protected const string undefine = "undefine";
+    //const string switchkey = "switch";//对标 homeassistant 状态协议 on off
+    //const string lightkey = "light";  //对标 homeassistant 状态协议 on off
+    //const string climate = "climate"; //对标 homeassistant 状态协议 on off
+    //const string binary_sensor = "binary_sensor"; //对标 homeassistant 状态协议 on off
+    //const string media_player = "media_player"; //对标 homeassistant 状态协议 idle
+    //const string person = "person"; //对标 homeassistant 状态协议 not_home
+    //const string cover = "cover"; //对标 homeassistant 状态协议 closed closing open opening
+    //const string fan = "fan"; //对标 homeassistant 状态协议 on off
+    const string on = "on"; //对标 homeassistant 状态协议
+    const string off = "off"; //对标 homeassistant 状态协议
+    protected const string undefine = "undefine"; //对标 homeassistant 状态协议
 
-    string head;
-    const string cmdon = "turn_on";
-    const string cmdoff = "turn_off";
-    protected bool open = false;
+    string head;    //todo 由用户提供，在面板绑定ID会被解析作为指令发给homeassitant，这里有bug！
+    const string cmdon = "turn_on"; //对标 homeassistant 状态协议
+    const string cmdoff = "turn_off"; //对标 homeassistant 状态协议
+    protected bool open = false;    //获得状态，目前只接了homeassitant开关。原因全接数据量过大还没优化！
 
+    /// <summary> bingding homeassistant </summary>
     public void SetEntity(string id)
     {
         if (string.IsNullOrEmpty(id))
@@ -42,6 +44,7 @@ public class HassEntity : MonoBehaviour
         }
     }
 
+    /// <summary> Click From mouse or touch </summary>
     public void Click()
     {
         if (string.IsNullOrEmpty(entity_id))
@@ -76,32 +79,35 @@ public class HassEntity : MonoBehaviour
         Shijie.ClickMessage(JsonUtility.ToJson(message));
     }
 
+    /// <summary> emmm  when mouseon</summary>
     public virtual void MouseOn()
     {
 
     }
 
-    /// <summary>hass 信息  开</summary>
+    /// <summary>from hass message open cmd</summary>
     protected virtual void TrunOn()
     {
 
     }
-    /// <summary>hass 信息  关</summary>
+    /// <summary>from hass message close cmd</summary>
     protected virtual void TrunOff()
     {
 
     }
-    /// <summary>hass 信息  非on/off</summary>
+    /// <summary>from hass message. not on/off</summary>
     protected virtual void Destine(string state)
     {
 
     }
 
+    /// <summary>after mouse longclick or touchlong</summary>
     protected virtual void AfterLongClick()
     {
 
     }
 
+    /// <summary> from hass message ans: on/off/other</summary>
     public void StateMeassge(string state)
     {
         if (state == on)
@@ -126,6 +132,7 @@ public class HassEntity : MonoBehaviour
         }
     }
 
+    /// <summary>when mouse longclick or touchlong</summary>
     public virtual void LongClick()
     {
         if (!string.IsNullOrEmpty(entity_id))
@@ -142,7 +149,7 @@ public class HassEntity : MonoBehaviour
 
     }
 
-    /// <summary>编辑模式 </summary>
+    /// <summary>into editor or exit editor mode</summary>
     public virtual void ReconstitutionMode(bool enter)
     {
         if (!editC)

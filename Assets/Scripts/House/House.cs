@@ -56,7 +56,7 @@ public class House : MonoBehaviour
 
     private async void ReadCustomConfig()
     {
-        var te = await Help.Instance.TextRequestlocal(false, Shijie.domain + "/3dscene_local/Customdata/houseconnfig.json", false);
+        var te = await Help.Instance.TextRequestlocal(false, "houseconnfig.json", false);
         if (te != null)
         {
             if (te.StartsWith(""))

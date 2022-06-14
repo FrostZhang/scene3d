@@ -9,6 +9,7 @@ public class CreatPanel : MonoBehaviour
     public static CreatPanel Instance;
     public RawImage icon;
     public Transform btns, panels;
+    public Button addmodeurl;
     public Dictionary<string, List<Ziyuan>> zdic { get; private set; }
     public class Ziyuan
     {
@@ -51,6 +52,10 @@ public class CreatPanel : MonoBehaviour
             });
         }
         Show(false);
+        addmodeurl.onClick.AddListener(() =>
+        {
+
+        });
     }
 
     public void Show(bool b)
