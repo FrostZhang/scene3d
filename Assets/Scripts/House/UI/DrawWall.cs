@@ -38,7 +38,7 @@ public class DrawWall : MonoBehaviour
             for (int i = 0; i < fs.Count; i++)
             {
                 var f = fs[i];
-                var te = await Help.Instance.TextureRequestlocal(true, f.previewpath);
+                var te = await Help.Instance.LoadTextureLocal(true, f.previewpath);
                 if (!te) continue;
                 var p = Instantiate(prefab, prefab.transform.parent);
                 p.gameObject.SetActive(true);

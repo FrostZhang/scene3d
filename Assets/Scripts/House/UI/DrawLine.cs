@@ -77,7 +77,7 @@ public class DrawLine : MonoBehaviour
         var dic = House.Instance.CureetHouse;
         foreach (var item in dic)
         {
-            if (item.Value == HouseEntityType.flowLine)
+            if (item.Value.entityType == HouseEntityType.flowLine)
             {
                 var e = item.Key.GetComponent<LineEntity>();
                 ShowLine(e);

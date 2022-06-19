@@ -21,7 +21,15 @@ public class ButtonList : MonoBehaviour
         if (instance == null)
             instance = this;
         self = GetComponent<Button>();
-        self.onClick.AddListener(() => Show(false, null));
+        self.onClick.AddListener(() =>
+        {
+            var rc = self.transform.GetChild(0) as RectTransform;
+            if (RectTransformUtility.RectangleContainsScreenPoint(rc, Input.mousePosition))
+            {
+                return;
+            }
+            Show(false, null);
+        });
         buttons = new List<Button>(100);
         Show(false, null);
     }

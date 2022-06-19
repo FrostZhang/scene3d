@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class BundleHelp : EditorWindow
 {
@@ -159,41 +160,53 @@ public class BundleHelp : EditorWindow
         }
     }
 
-    void ReadPreviewTex()
+   async  void ReadPreviewTex()
     {
-        if (GUILayout.Button("∂¡»°‘§¿¿Õº∆¨"))
+        if (GUILayout.Button("‘∆“Ù¿÷"))
         {
-            var os = Directory.GetFiles(System.Environment.CurrentDirectory + "/Assets/AssetsBundle", "*", SearchOption.AllDirectories);
-            foreach (var item in os)
+            DownloadHandlerBuffer downloadHandler = new DownloadHandlerBuffer();
+             UnityWebRequest unityWebRequest = new UnityWebRequest("https://music.163.com/#/playlist?id=7280347904");
             {
-                if (item.EndsWith(".prefab"))
-                {
-                    var path = item.Remove(0, item.IndexOf("Assets/"));
-                    var o = AssetDatabase.LoadMainAssetAtPath(path);
-                    if (o)
-                    {
-                        if (o is GameObject)
-                        {
-                            var g = o as GameObject;
-                            g = Instantiate(g);
-                            g.transform.position = new Vector3(0, 0, 5);
-
-                            var bounds = GetMaxBounds(g);
-                            var boundRadius = bounds.extents.magnitude;
-                            var mainCa = Camera.main;
-                            var finalDistance = boundRadius / (2.0f * Mathf.Tan(0.5f * mainCa.fieldOfView * Mathf.Deg2Rad)) * 1;
-                            if (float.IsNaN(finalDistance))
-                            {
-                                finalDistance = 15;
-                            }
-                            mainCa.transform.forward = (g.transform.position - mainCa.transform.position);
-                            mainCa.transform.position = g.transform.position - mainCa.transform.forward.normalized * finalDistance;
-                        }
-                        break;
-                    }
-                }
+                unityWebRequest.downloadHandler = downloadHandler;
+                await unityWebRequest.SendWebRequest();
+                Debug.Log(unityWebRequest);
+                var d = DownloadHandlerBuffer.GetContent(unityWebRequest);
+                Debug.Log(d);
             }
         }
+        //if (GUILayout.Button("∂¡»°‘§¿¿Õº∆¨"))
+        //{
+        //    var os = Directory.GetFiles(System.Environment.CurrentDirectory + "/Assets/AssetsBundle", "*", SearchOption.AllDirectories);
+        //    foreach (var item in os)
+        //    {
+        //        if (item.EndsWith(".prefab"))
+        //        {
+        //            var path = item.Remove(0, item.IndexOf("Assets/"));
+        //            var o = AssetDatabase.LoadMainAssetAtPath(path);
+        //            if (o)
+        //            {
+        //                if (o is GameObject)
+        //                {
+        //                    var g = o as GameObject;
+        //                    g = Instantiate(g);
+        //                    g.transform.position = new Vector3(0, 0, 5);
+
+        //                    var bounds = GetMaxBounds(g);
+        //                    var boundRadius = bounds.extents.magnitude;
+        //                    var mainCa = Camera.main;
+        //                    var finalDistance = boundRadius / (2.0f * Mathf.Tan(0.5f * mainCa.fieldOfView * Mathf.Deg2Rad)) * 1;
+        //                    if (float.IsNaN(finalDistance))
+        //                    {
+        //                        finalDistance = 15;
+        //                    }
+        //                    mainCa.transform.forward = (g.transform.position - mainCa.transform.position);
+        //                    mainCa.transform.position = g.transform.position - mainCa.transform.forward.normalized * finalDistance;
+        //                }
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
     }
 
     public static Bounds GetMaxBounds(GameObject t)

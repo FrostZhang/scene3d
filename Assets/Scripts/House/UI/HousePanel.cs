@@ -42,7 +42,7 @@ public class HousePanel : MonoBehaviour
                 List<Eye> eyes = new List<Eye>();
                 foreach (var item in House.Instance.CureetHouse)
                 {
-                    if (item.Value == HouseEntityType.eye)
+                    if (item.Value.entityType == HouseEntityType.eye)
                     {
                         var e = item.Key.GetComponent<Eye>();
                         e.Show(true);
@@ -64,7 +64,7 @@ public class HousePanel : MonoBehaviour
             {
                 foreach (var item in House.Instance.CureetHouse)
                 {
-                    if (item.Value == HouseEntityType.eye)
+                    if (item.Value.entityType == HouseEntityType.eye)
                     {
                         var e = item.Key.GetComponent<Eye>();
                         e.Show(false);

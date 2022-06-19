@@ -85,9 +85,9 @@ public class DrawApp : MonoBehaviour
                 var f = fs[i];
                 Texture2D te = null;
                 if (f.supplier != null)
-                    te = await Help.Instance.TextureRequestlocal(false, f.supplier + "/" + f.previewpath);
+                    te = await Help.Instance.LoadTextureLocal(false, f.supplier + "/" + f.previewpath);
                 else
-                    te = await Help.Instance.TextureRequestlocal(true, f.previewpath);
+                    te = await Help.Instance.LoadTextureLocal(true, f.previewpath);
                 if (!te) continue;
                 var index = i % prefabs.Count;
                 var p = Instantiate(prefabs[index], prefabs[index].parent);

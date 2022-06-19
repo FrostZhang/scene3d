@@ -65,7 +65,7 @@ public class CreatPanel : MonoBehaviour
 
     private async Task AnsLocalResource()
     {
-        var te = await Help.Instance.TextRequestlocal(true, "3dscene.json", false);
+        var te = await Help.Instance.LoadTextlocal(true, "3dscene.json", false);
         if (te != null)
         {
             var jd = LitJson.JsonMapper.ToObject(te);
@@ -104,7 +104,7 @@ public class CreatPanel : MonoBehaviour
             }
         }
 
-        te = await Help.Instance.TextRequestlocal(false, "supplier.json", false);
+        te = await Help.Instance.LoadTextlocal(false, "supplier.json", false);
         if (te != null)
         {
             var jd = LitJson.JsonMapper.ToObject(te);
@@ -128,7 +128,7 @@ public class CreatPanel : MonoBehaviour
 
     private async Task AnsSupplierResource(string supplier)
     {
-        var te = await Help.Instance.TextRequestlocal(false, supplier + "/3dscene.json", false);
+        var te = await Help.Instance.LoadTextlocal(false, supplier + "/3dscene.json", false);
         if (te != null)
         {
             var jd = LitJson.JsonMapper.ToObject(te);

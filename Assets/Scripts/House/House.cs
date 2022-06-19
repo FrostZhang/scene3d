@@ -9,19 +9,69 @@ using UnityEngine.EventSystems;
 
 public enum HouseEntityType
 {
-    wall, floor, door, stand, sky, arealight, appliances, flowLine, animal, weather, eye
+    wall, floor, door, stand, sky, arealight, appliances, flowLine, animal, weather, eye, none
 }
+public class HouseEntityData
+{
+    public string shortname;
+    public HouseEntityType entityType;
+
+    public HouseEntityData(HouseEntityType entityType)
+    {
+        this.entityType = entityType;
+    }
+
+    public string supplier;
+    public string url;
+
+    public HouseEntityData(string url)
+    {
+        this.url = url;
+    }
+
+    public HouseEntityData(string shortname, HouseEntityType entityType)
+    {
+        this.shortname = shortname;
+        this.entityType = entityType;
+    }
+}
+
+public class CreatData
+{
+    public string prefabname;
+    public string unitypos;
+    public string color;
+    public string entity_id;
+    public string supplier;
+    public string url;
+    public string moreinfo;
+
+    public CreatData(string prefabname, string unitypos)
+    {
+        this.prefabname = prefabname;
+        this.unitypos = unitypos;
+    }
+
+    public CreatData(string prefabname, string unitypos, string color)
+    {
+        this.prefabname = prefabname;
+        this.unitypos = unitypos;
+        this.color = color;
+    }
+}
+
 public class House : MonoBehaviour
 {
     public static House Instance;
     public Transform parent { get; set; }
-    public Dictionary<Transform, HouseEntityType> CureetHouse { get => cureetHouse; }
+    public Dictionary<Transform, HouseEntityData> CureetHouse { get => cureetHouse; }
     public List<string> HomeassistantEntities { get => homeassistantEntities; }
 
     public Transform canvas;
     List<HassEntity> lis;
-    Dictionary<Transform, HouseEntityType> cureetHouse;
+    Dictionary<Transform, HouseEntityData> cureetHouse;
     List<string> homeassistantEntities;
+
     void Awake()
     {
         Instance = this;
@@ -30,7 +80,7 @@ public class House : MonoBehaviour
         QualitySettings.SetQualityLevel(2);
         lis = new List<HassEntity>(100);
         homeassistantEntities = new List<string>(100);
-        cureetHouse = new Dictionary<Transform, HouseEntityType>(200);
+        cureetHouse = new Dictionary<Transform, HouseEntityData>(200);
     }
 
 
@@ -56,7 +106,7 @@ public class House : MonoBehaviour
 
     private async void ReadCustomConfig()
     {
-        var te = await Help.Instance.TextRequestlocal(false, "houseconnfig.json", false);
+        var te = await Help.Instance.LoadTextlocal(false, "houseconnfig.json", false);
         if (te != null)
         {
             if (te.StartsWith(""))
@@ -67,13 +117,16 @@ public class House : MonoBehaviour
         else
         {
             CreatFloor("groud1", "0,0,10,10,1,1", 0, null);
-            CreatAppliances("text", "0,0,0.5,90,0,0,2,0.6,0.6", "", "hello , Welcome home", "yellow", null);
+            var data = new CreatData("text", "0,0,0.5,90,0,0,2,0.6,0.6");
+            data.color = "yellow";
+            data.moreinfo = "hello , Welcome home";
+            CreatAppliances(data);
         }
     }
 
     private async void Test()
     {
-        var te = await Help.Instance.TextRequestlocal(true, "Customdata/houseconnfig.json");
+        var te = await Help.Instance.LoadTextlocal(true, "Customdata/houseconnfig.json");
         if (te != null)
         {
             if (te.StartsWith(""))
@@ -303,8 +356,10 @@ public class House : MonoBehaviour
         //    -1, "255,0,252,255", "red", "");
         CreatStand("electricball", "-3.986,3.766,1.085,0,0,0,0.4,0.4,0.4", null);
         HouseWeather.Instance.CreatSky("space");
-        CreatAppliances("tv", "-1.56,-1.565,0.41,0,-90,0,0.7,0.7,0.7", "switch.xxx", null, null, null);
-        CreatAppliances("washer", "-1.68,-4.166,0,0,-90,0,1,1,1", "switch.xxx", null, null, null);
+        CreatData data = new CreatData("tv", "-1.56,-1.565,0.41,0,-90,0,0.7,0.7,0.7");
+        CreatAppliances(data);
+        data = new CreatData("washer", "-1.68,-4.166,0,0,-90,0,1,1,1");
+        CreatAppliances(data);
     }
 
     /// <summary>xywh </summary>
@@ -319,7 +374,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ss[2], out va)) w = va; else return null;
         if (float.TryParse(ss[3], out va)) h = va; else return null;
 
-        var ab = await Help.Instance.ABLoadlocal("animal", cusname);
+        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("animal", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -330,15 +385,16 @@ public class House : MonoBehaviour
         area.localScale = new Vector3(w, 0, h);
         var animal = tr.GetComponent<ZebraEntity>();
         animal.SetArea(area);
-        cureetHouse.Add(tr.transform, HouseEntityType.animal);
+        HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.animal);
+        cureetHouse.Add(tr.transform, data);
         return animal;
     }
 
     /// <summary>posxzy anglexyz scalexyz </summary>
-    public async Task<HassEntity> CreatAppliances(string cusname, string str, string id, string more, string color, string supplier)
+    public async Task<HassEntity> CreatAppliances(CreatData creatData)
     {
-        if (string.IsNullOrEmpty(str)) return null;
-        var ss = str.Split(',');
+        if (string.IsNullOrEmpty(creatData.unitypos)) return null;
+        var ss = creatData.unitypos.Split(',');
         if (ss.Length == 9)
         {
             float va, x, y, z, rx, ry, rz, sx, sy, sz;
@@ -351,7 +407,7 @@ public class House : MonoBehaviour
             if (float.TryParse(ss[6], out va)) sx = va; else return null;
             if (float.TryParse(ss[7], out va)) sy = va; else return null;
             if (float.TryParse(ss[8], out va)) sz = va; else return null;
-            var tr = await CreatAppliances(cusname, id, supplier);
+            var tr = await CreatAppliances(creatData.prefabname, creatData.entity_id, creatData.supplier);
             if (tr)
             {
                 tr.transform.position = new Vector3(x, z, y);
@@ -361,9 +417,9 @@ public class House : MonoBehaviour
             if (tr is TextEntity)
             {
                 var e = tr as TextEntity;
-                if (!string.IsNullOrEmpty(more))
+                if (!string.IsNullOrEmpty(creatData.moreinfo))
                 {
-                    ss = more.Split(',');
+                    ss = creatData.moreinfo.Split(',');
                     if (ss.Length == 2)
                     {
                         e.front = ss[0];
@@ -371,21 +427,21 @@ public class House : MonoBehaviour
                     }
                 }
                 Color c;
-                if (Help.Instance.TryColor(color, out c))
+                if (Help.Instance.TryColor(creatData.color, out c))
                     e.textMesh.color = c;
             }
             else if (tr is AlarmEntity)
             {
                 var e = tr as AlarmEntity;
                 Color c;
-                if (Help.Instance.TryColor(color, out c))
+                if (Help.Instance.TryColor(creatData.color, out c))
                     e.YuanMa.SetColor("_Color", c);
             }
             else if (tr is LampEntity)
             {
                 var e = tr as LampEntity;
                 Color c;
-                if (Help.Instance.TryColor(color, out c))
+                if (Help.Instance.TryColor(creatData.color, out c))
                     e.emColor = c;
             }
         }
@@ -397,13 +453,13 @@ public class House : MonoBehaviour
         GameObject tr = null;
         if (string.IsNullOrEmpty(supplier))
         {
-            var ab = await Help.Instance.ABLoadlocal("appliances", cusname);
+            var ab = await Help.Instance.LoadAsherlinkdataInSAssets("appliances", cusname);
             if (ab == null) return null;
             tr = ab.LoadAsset<GameObject>(cusname);
         }
         else
         {
-            var ab = await Help.Instance.ABLoadsupplier("appliances", cusname, supplier);
+            var ab = await Help.Instance.LoadAsherlinkdataInSupplier("appliances", cusname, supplier);
             if (ab == null) return null;
             tr = ab.LoadAsset<GameObject>(cusname);
         }
@@ -421,7 +477,8 @@ public class House : MonoBehaviour
                 lis.Add(e);
             }
         }
-        cureetHouse.Add(tr.transform, HouseEntityType.appliances);
+        HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.appliances);
+        cureetHouse.Add(tr.transform, data);
         return e;
     }
     /// <summary>posxzy anglexyz scalexyz </summary>
@@ -456,12 +513,13 @@ public class House : MonoBehaviour
     /// <summary>posxzy anglexyz scalexyz </summary>
     public async Task<Transform> CreatStand(string cusname, string color)
     {
-        var ab = await Help.Instance.ABLoadlocal("stand", cusname);
+        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("stand", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
         tr.name = cusname;
-        cureetHouse.Add(tr.transform, HouseEntityType.stand);
+        HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.stand);
+        cureetHouse.Add(tr.transform, data);
         var collider = tr.GetComponent<Collider>();
         if (collider) collider.enabled = false;
         return tr.transform;
@@ -500,12 +558,13 @@ public class House : MonoBehaviour
 
     public async Task<Transform> CreatEye(string cusname)
     {
-        var ab = await Help.Instance.ABLoadlocal("look", cusname);
+        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("look", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
         tr.name = cusname;
-        cureetHouse.Add(tr.transform, HouseEntityType.eye);
+        HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.eye);
+        cureetHouse.Add(tr.transform, data);
         return tr.transform;
     }
 
@@ -513,7 +572,7 @@ public class House : MonoBehaviour
     {
         var vs = GetPoss(pos);
         if (vs == null) return null;
-        var ab = await Help.Instance.ABLoadlocal("line", "flowline");
+        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("line", "flowline");
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>("flowline");
         var lineE = Instantiate(tr, parent).GetComponent<LineEntity>();
@@ -531,7 +590,8 @@ public class House : MonoBehaviour
             lineE.SetOnc(c);
         if (Help.Instance.TryColor(coff, out c))
             lineE.SetOffc(c);
-        cureetHouse.Add(lineE.transform, HouseEntityType.flowLine);
+        HouseEntityData data = new HouseEntityData(HouseEntityType.flowLine);
+        cureetHouse.Add(lineE.transform, data);
         var ma = lineE.line.material;
         ma = new Material(ma);
         ma.SetFloat("_Speed", speed);
@@ -580,7 +640,7 @@ public class House : MonoBehaviour
             if (float.TryParse(ss[8], out va)) sz = va; else return null;
             if (float.TryParse(ss[9], out va)) open = va; else return null;
 
-            var ab = await Help.Instance.ABLoadlocal("door", cusname);
+            var ab = await Help.Instance.LoadAsherlinkdataInSAssets("door", cusname);
             if (ab == null) return null;
             var tr = ab.LoadAsset<GameObject>(cusname);
             tr = Instantiate(tr, parent);
@@ -597,7 +657,8 @@ public class House : MonoBehaviour
                 le.SetEntity(id);
                 lis.Add(le);
             }
-            cureetHouse.Add(tr.transform, HouseEntityType.door);
+            HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.door);
+            cureetHouse.Add(tr.transform, data);
             le.angleopen = open;
             Color sc;
             if (Help.Instance.TryColor(color, out sc))
@@ -644,7 +705,8 @@ public class House : MonoBehaviour
                 le.SetEntity(id);
                 lis.Add(le);
             }
-            cureetHouse.Add(tr.transform, HouseEntityType.arealight);
+            HouseEntityData data = new HouseEntityData(HouseEntityType.arealight);
+            cureetHouse.Add(tr.transform, data);
             le.clight.intensity = li;
             Color c;
             if (Help.Instance.TryColor(color, out c))
@@ -670,7 +732,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ss[4], out va)) tx = va; else return null;
         if (float.TryParse(ss[5], out va)) ty = va; else return null;
 
-        var ab = await Help.Instance.ABLoadlocal("floor", cusname);
+        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("floor", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
@@ -684,7 +746,8 @@ public class House : MonoBehaviour
         if (Help.Instance.TryColor(color, out c))
             ma.color = c;
         tr.GetComponent<MeshRenderer>().material = ma;
-        cureetHouse.Add(tr.transform, HouseEntityType.floor);
+        HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.floor);
+        cureetHouse.Add(tr.transform, data);
         var collider = tr.GetComponent<Collider>();
         if (collider) collider.enabled = false;
         return tr.transform;
@@ -706,7 +769,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ws[5], out va)) h = va; else return null;
         if (float.TryParse(ws[6], out va)) t = va; else return null;
 
-        var ab = await Help.Instance.ABLoadlocal("wall", cusname);
+        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("wall", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         var cube = Instantiate(tr, parent);
@@ -722,7 +785,8 @@ public class House : MonoBehaviour
         {
             r.material.color = wcolor;
         }
-        cureetHouse.Add(cube.transform, HouseEntityType.wall);
+        HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.wall);
+        cureetHouse.Add(cube.transform, data);
         var collider = tr.GetComponent<Collider>();
         if (collider) collider.enabled = false;
         return cube.transform;
@@ -890,7 +954,10 @@ public class House : MonoBehaviour
                 color = dic["color"]?.ToString();
             if (dic.Contains("supplier"))
                 supplier = dic["supplier"]?.ToString();
-            CreatAppliances(cusname, pos, entity, more, color, supplier);
+            var data = new CreatData(cusname,pos, color);
+            data.moreinfo = more;
+            data.supplier = supplier;
+            CreatAppliances(data);
         });
     }
     private void AnsSky(JsonData jd)
@@ -1007,7 +1074,7 @@ public class House : MonoBehaviour
     public string House2Json()
     {
         var hs = from a in cureetHouse
-                 group a.Key by a.Value;
+                 group a.Key by a.Value.entityType;
         JsonWriter writer = new JsonWriter();
         writer.WriteObjectStart();
         foreach (var group in hs)

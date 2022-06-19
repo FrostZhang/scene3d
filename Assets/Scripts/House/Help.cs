@@ -13,7 +13,7 @@ public class Help : MonoBehaviour
 
     Dictionary<string, AssetBundle> bundles;
     Dictionary<string, Color> colors;
-
+    Dictionary<string, HouseEntityType> houseEntityTypes;
     List<string> works;
 
     public string streamingAssetsPath = Application.streamingAssetsPath;
@@ -35,75 +35,135 @@ public class Help : MonoBehaviour
         colors.Add("white", Color.white);
         colors.Add("blue", Color.blue);
         colors.Add("green", Color.green);
-
+        houseEntityTypes = new Dictionary<string, HouseEntityType>(15);
+        houseEntityTypes.Add("wall", HouseEntityType.wall);
+        houseEntityTypes.Add("floor", HouseEntityType.floor);
+        houseEntityTypes.Add("door", HouseEntityType.door);
+        houseEntityTypes.Add("stand", HouseEntityType.stand);
+        houseEntityTypes.Add("sky", HouseEntityType.sky);
+        houseEntityTypes.Add("arealight", HouseEntityType.arealight);
+        houseEntityTypes.Add("anappliancesimal", HouseEntityType.appliances);
+        houseEntityTypes.Add("flowLine", HouseEntityType.flowLine);
+        houseEntityTypes.Add("animal", HouseEntityType.animal);
+        houseEntityTypes.Add("weather", HouseEntityType.weather);
+        houseEntityTypes.Add("eye", HouseEntityType.eye);
 #if UNITY_WEBGL && !UNITY_EDITOR
         streamingAssetsPath = Shijie.domain + "/3dscene_local/StreamingAssets";
         customdatapath = Shijie.domain + "/3dscene_local/Customdata";
 #endif
     }
 
-    public async Task<AssetBundle> ABLoadlocal(string root, string key)
+    public string CombineAsherlinkdataInStreamingAssets(string root, string key)
     {
         string dk = key + "_" + root + ".asherlinkdata";
-        if (bundles.ContainsKey(dk))
-        {
-            return bundles[dk];
-        }
-        else if (works.Contains(dk))
-        {
-            await new WaitUntilAsync(() => bundles.ContainsKey(dk));
-            return bundles[dk];
-        }
         var path = $"{streamingAssetsPath}/{root}/{dk}";
-        System.Uri uri = new System.Uri(path);
-        return await ABRequest(dk, uri);
+        return path;
     }
 
-    public async Task<AssetBundle> ABLoadsupplier(string root, string key, string supplier)
+    public string CombineAsherlinkdataInCustomdata(string root, string key)
     {
-        string dickey = supplier + "_" + key + "_" + root + ".asherlinkdata";
         string dk = key + "_" + root + ".asherlinkdata";
-        if (bundles.ContainsKey(dickey))
-        {
-            return bundles[dickey];
-        }
-        else if (works.Contains(dickey))
-        {
-            await new WaitUntilAsync(() => bundles.ContainsKey(dickey));
-            return bundles[dickey];
-        }
-        var path = $"{customdatapath}/{supplier}/{root}/{dk}";
-        System.Uri uri = new System.Uri(path);
-        return await ABRequest(dk, uri);
+        var path = $"{customdatapath}/{root}/{dk}";
+        return path;
     }
 
-    async Task<AssetBundle> ABRequest(string dk, System.Uri uri)
+    public string CombineStreamingAssetsPath(params string[] rpath)
+    {
+        var path = streamingAssetsPath;
+        foreach (var item in rpath)
+        {
+            path += "/" + item;
+        }
+        return path;
+    }
+
+    public string CombineCustomdataPath(params string[] rpath)
+    {
+        var path = customdatapath;
+        foreach (var item in rpath)
+        {
+            path += "/" + item;
+        }
+        return path;
+    }
+
+    public async Task<AssetBundle> LoadAsherlinkdataInSAssets(string root, string key)
+    {
+        string bundleID = key + "_" + root + ".asherlinkdata";
+        if (bundles.ContainsKey(bundleID))
+        {
+            return bundles[bundleID];
+        }
+        else if (works.Contains(bundleID))
+        {
+            await new WaitUntilAsync(() => bundles.ContainsKey(bundleID));
+            return bundles[bundleID];
+        }
+        var path = $"{streamingAssetsPath}/{root}/{bundleID}";
+        System.Uri uri = new System.Uri(path);
+        return await LoadAssetBundle(bundleID, uri);
+    }
+
+    public async Task<AssetBundle> LoadAsherlinkdataInSupplier(string root, string key, string supplier)
+    {
+        string bundleID = supplier + "_" + key + "_" + root + ".asherlinkdata";
+        string dataname = key + "_" + root + ".asherlinkdata";
+        if (bundles.ContainsKey(bundleID))
+        {
+            return bundles[bundleID];
+        }
+        else if (works.Contains(bundleID))
+        {
+            await new WaitUntilAsync(() => bundles.ContainsKey(bundleID));
+            return bundles[bundleID];
+        }
+        var path = $"{customdatapath}/{supplier}/{root}/{dataname}";
+        System.Uri uri = new System.Uri(path);
+        return await LoadAssetBundle(bundleID, uri);
+    }
+
+
+    public async Task<AssetBundle> LoadAsherlinkdataInWWW(string bundleID, System.Uri uri)
+    {
+        if (bundles.ContainsKey(bundleID))
+        {
+            return bundles[bundleID];
+        }
+        else if (works.Contains(bundleID))
+        {
+            await new WaitUntilAsync(() => bundles.ContainsKey(bundleID));
+            return bundles[bundleID];
+        }
+        return await LoadAssetBundle(bundleID, uri);
+    }
+
+    async Task<AssetBundle> LoadAssetBundle(string bundleID, System.Uri uri)
     {
         AssetBundle res = null;
-        works.Add(dk);
+        works.Add(bundleID);
         using (var request = UnityWebRequestAssetBundle.GetAssetBundle(uri))
         {
             await request.SendWebRequest();
             if (request.result != UnityWebRequest.Result.Success)
             {
-                bundles.Add(dk, null);
-                Debug.LogError("找不到ab:" + dk);
+                bundles.Add(bundleID, null);
+                Debug.LogError("找不到ab:" + bundleID);
             }
             else
             {
                 res = DownloadHandlerAssetBundle.GetContent(request);
                 if (res)
-                    bundles.Add(dk, res);
+                    bundles.Add(bundleID, res);
             }
         }
-        works.Remove(dk);
+        works.Remove(bundleID);
         return res;
     }
 
-    public async Task<Texture2D> TextureRequestlocal(bool isstreamingAssets, string path)
+    public async Task<Texture2D> LoadTextureLocal(bool sAssetsOrcusdata, string path)
     {
         System.Uri uri;
-        if (isstreamingAssets)
+        if (sAssetsOrcusdata)
         {
             uri = new System.Uri(streamingAssetsPath + "/" + path);
         }
@@ -126,7 +186,27 @@ public class Help : MonoBehaviour
         return null;
     }
 
-    public async Task<string> TextRequestlocal(bool isstreamingAssets, string path, bool cache = true)
+    public async Task<Texture2D> LoadTextureWWW(string url)
+    {
+        if (!url.StartsWith("http"))
+            return null;
+        System.Uri uri = new System.Uri(url);
+        using (var request = UnityWebRequestTexture.GetTexture(uri))
+        {
+            await request.SendWebRequest();
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("找不到地址:" + uri);
+            }
+            else
+            {
+                return DownloadHandlerTexture.GetContent(request);
+            }
+        }
+        return null;
+    }
+
+    public async Task<string> LoadTextlocal(bool isstreamingAssets, string path, bool cache = true)
     {
         System.Uri uri;
         string res = null;
@@ -216,4 +296,12 @@ public class Help : MonoBehaviour
         return false;
     }
 
+    public HouseEntityType string2HouseEntityType(string str)
+    {
+        if (houseEntityTypes.ContainsKey(str))
+        {
+            return houseEntityTypes[str];
+        }
+        return HouseEntityType.none;
+    }
 }

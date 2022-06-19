@@ -199,8 +199,8 @@ public class Reconstitution : MonoBehaviour
         if (House.Instance.CureetHouse.ContainsKey(target))
         {
             var t = House.Instance.CureetHouse[target];
-            cureetET = t;
-            switch (t)
+            cureetET = t.entityType;
+            switch (cureetET)
             {
                 case HouseEntityType.wall:
                     ShowWallProp(target);

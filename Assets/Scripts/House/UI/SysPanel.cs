@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class SysPanel : MonoBehaviour
 {
-    public Button save, weather;
+    public Button save, weather, addwwwResource;
     public Toggle autoSun;
     public Slider sunIn, ro;
     public GameObject suninpa;
@@ -36,6 +36,12 @@ public class SysPanel : MonoBehaviour
             HouseWeather.Instance.SetTianGuang(x);
         });
         sunIn.value = CacheData.SunIntensity;
+
+        addwwwResource.onClick.AddListener(() =>
+        {
+            var ap = Resources.Load<GameObject>("UI/AddModelPanel");
+            ap = Instantiate(ap, House.Instance.canvas);
+        });
     }
 
     private void Save()
