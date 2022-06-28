@@ -16,8 +16,8 @@ public class Help : MonoBehaviour
     Dictionary<string, HouseEntityType> houseEntityTypes;
     List<string> works;
 
-    public string streamingAssetsPath = Application.streamingAssetsPath;
-    public string customdatapath = Application.streamingAssetsPath + "/Customdata";
+    public string streamingAssetsPath { get; } = Application.streamingAssetsPath;
+    public string customdatapath { get; } = Application.streamingAssetsPath + "/Customdata";
 
     private void Awake()
     {

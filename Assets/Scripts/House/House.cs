@@ -954,9 +954,10 @@ public class House : MonoBehaviour
                 color = dic["color"]?.ToString();
             if (dic.Contains("supplier"))
                 supplier = dic["supplier"]?.ToString();
-            var data = new CreatData(cusname,pos, color);
+            var data = new CreatData(cusname, pos, color);
             data.moreinfo = more;
             data.supplier = supplier;
+            data.entity_id = entity;
             CreatAppliances(data);
         });
     }
