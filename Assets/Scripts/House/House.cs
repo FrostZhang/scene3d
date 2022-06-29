@@ -988,6 +988,7 @@ public class House : MonoBehaviour
             var data = new CreatData(cusname, pos, color);
             data.moreinfo = more;
             data.supplier = supplier;
+            data.entity_id = entity;
             CreatAppliances(data);
         });
     }
