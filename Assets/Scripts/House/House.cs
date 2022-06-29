@@ -470,7 +470,6 @@ public class House : MonoBehaviour
         var e = tr.GetComponent<HassEntity>();
         if (e)
         {
-            e.Supplier = supplier;
             if (!string.IsNullOrWhiteSpace(id))
             {
                 e.SetEntity(id);
@@ -478,6 +477,7 @@ public class House : MonoBehaviour
             }
         }
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.appliances);
+        data.supplier = supplier;
         cureetHouse.Add(tr.transform, data);
         return e;
     }
@@ -523,6 +523,37 @@ public class House : MonoBehaviour
         var collider = tr.GetComponent<Collider>();
         if (collider) collider.enabled = false;
         return tr.transform;
+    }
+
+    public async Task<Transform> CreatStandFromWWW(string url)
+    {
+        AssetBundle ab = null;
+        if (url.StartsWith("http"))
+        {
+            ab = await Help.Instance.LoadAsherlinkdataInWWW(url, new System.Uri(url));
+        }
+        else if (url.StartsWith("/"))
+        {
+            var cusurl = Help.Instance.CombineCustomdataPath(url.Remove(0, 1));
+            ab = await Help.Instance.LoadAsherlinkdataInWWW(cusurl, new System.Uri(cusurl));
+        }
+        if (ab == null) return null;
+        var bs = ab.LoadAllAssets();
+        if (bs != null && bs.Length > 0)
+        {
+            var tr = bs[0] as GameObject;
+            if (tr)
+            {
+                tr = Instantiate(tr, parent);
+                //tr.name = cusname;
+                HouseEntityData data = new HouseEntityData(url);
+                cureetHouse.Add(tr.transform, data);
+                var collider = tr.GetComponent<Collider>();
+                if (collider) collider.enabled = false;
+                return tr.transform;
+            }
+        }
+        return null;
     }
 
     public async Task<Eye> CreatEye(string cusname, string pos, string priority, string text)
@@ -954,7 +985,7 @@ public class House : MonoBehaviour
                 color = dic["color"]?.ToString();
             if (dic.Contains("supplier"))
                 supplier = dic["supplier"]?.ToString();
-            var data = new CreatData(cusname,pos, color);
+            var data = new CreatData(cusname, pos, color);
             data.moreinfo = more;
             data.supplier = supplier;
             CreatAppliances(data);
@@ -1074,7 +1105,7 @@ public class House : MonoBehaviour
     public string House2Json()
     {
         var hs = from a in cureetHouse
-                 group a.Key by a.Value.entityType;
+                 group a by a.Value.entityType;
         JsonWriter writer = new JsonWriter();
         writer.WriteObjectStart();
         foreach (var group in hs)
@@ -1132,41 +1163,48 @@ public class House : MonoBehaviour
         return writer.ToString();
     }
 
-    private void Weather2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Weather2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("weather");
         writer.Write(HouseWeather.Instance.Entity_id);
     }
 
-    private void Animal2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Animal2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("animal");
         writer.WriteArrayStart();
         foreach (var g in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(g.name);
+            writer.WritePropertyName(g.Value.shortname);
             writer.WriteObjectStart();
-            var anim = g.GetComponent<ZebraEntity>();
+            var tr = g.Key;
+            var anim = tr.GetComponent<ZebraEntity>();
             writer.WritePropertyName("pos");
             var item = anim.Area;
             writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.localScale.x:f2},{item.localScale.z:f2}");
+            if (!string.IsNullOrEmpty(g.Value.url))
+            {
+                writer.WritePropertyName("url");
+                writer.Write(g.Value.url);
+            }
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();
         }
         writer.WriteArrayEnd();
     }
 
-    private void Line2Josn(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Line2Josn(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("flowLine");
         writer.WriteArrayStart();
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.name);
+            writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
-            var line = item.GetComponent<LineEntity>();
+            var tr = item.Key;
+            var line = tr.GetComponent<LineEntity>();
             writer.WritePropertyName("pos");
             Vector3[] v3s = new Vector3[line.line.positionCount];
             line.line.GetPositions(v3s);
@@ -1192,24 +1230,30 @@ public class House : MonoBehaviour
         writer.WriteArrayEnd();
     }
 
-    private void App2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void App2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("appliances");
         writer.WriteArrayStart();
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.name);
+            writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
             writer.WritePropertyName("pos");
-            writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.position.y:f2},{item.eulerAngles.x:f2},{item.eulerAngles.y:f2},{item.eulerAngles.z:f2},{item.localScale.x:f2},{item.localScale.y:f2},{item.localScale.z:f2}");
+            var utr = item.Key;
+            writer.Write($"{utr.position.x:f2},{utr.position.z:f2},{utr.position.y:f2},{utr.eulerAngles.x:f2},{utr.eulerAngles.y:f2},{utr.eulerAngles.z:f2},{utr.localScale.x:f2},{utr.localScale.y:f2},{utr.localScale.z:f2}");
             writer.WritePropertyName("entity");
-            var tr = item.GetComponent<HassEntity>();
+            var tr = utr.GetComponent<HassEntity>();
             writer.Write(tr.Entity_id);
-            if (!string.IsNullOrWhiteSpace(tr.Supplier))
+            if (!string.IsNullOrWhiteSpace(item.Value.supplier))
             {
                 writer.WritePropertyName("supplier");
-                writer.Write(tr.Supplier);
+                writer.Write(item.Value.supplier);
+            }
+            if (!string.IsNullOrEmpty(item.Value.url))
+            {
+                writer.WritePropertyName("url");
+                writer.Write(item.Value.url);
             }
             if (tr is AlarmEntity)
             {
@@ -1240,18 +1284,19 @@ public class House : MonoBehaviour
         writer.WriteArrayEnd();
     }
 
-    private void Arealight2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Arealight2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("arealight");
         writer.WriteArrayStart();
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.name);
+            writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
-            var lit = item.GetComponent<LightEntity>();
+            var tr = item.Key;
+            var lit = tr.GetComponent<LightEntity>();
             writer.WritePropertyName("pos");
-            writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.localScale.x:f2},{item.localScale.z:f2},{lit.Max:f2}");
+            writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.localScale.x:f2},{tr.localScale.z:f2},{lit.Max:f2}");
             writer.WritePropertyName("color");
             Color32 ma = lit.clight.color;
             writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
@@ -1263,40 +1308,47 @@ public class House : MonoBehaviour
         writer.WriteArrayEnd();
     }
 
-    private void Stand2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Stand2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("stand");
         writer.WriteArrayStart();
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.name);
+            writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
             writer.WritePropertyName("pos");
-            writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.position.y:f2},{item.eulerAngles.x:f2},{item.eulerAngles.y:f2},{item.eulerAngles.z:f2},{item.localScale.x:f2},{item.localScale.y:f2},{item.localScale.z:f2}");
+            var tr = item.Key;
+            writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.position.y:f2},{tr.eulerAngles.x:f2},{tr.eulerAngles.y:f2},{tr.eulerAngles.z:f2},{tr.localScale.x:f2},{tr.localScale.y:f2},{tr.localScale.z:f2}");
             //writer.WritePropertyName("color");
             //Color32 ma = item.GetComponent<MeshRenderer>().material.color;
             //writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
+            if (!string.IsNullOrEmpty(item.Value.url))
+            {
+                writer.WritePropertyName("url");
+                writer.Write(item.Value.url);
+            }
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();
         }
         writer.WriteArrayEnd();
     }
 
-    private void Door2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Door2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("door");
         writer.WriteArrayStart();
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.name);
+            writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
-            var door = item.GetComponent<DoorEntity>();
+            var tr = item.Key;
+            var door = tr.GetComponent<DoorEntity>();
             writer.WritePropertyName("pos");
-            writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.position.y:f2},{item.eulerAngles.x:f2},{item.eulerAngles.y:f2},{item.eulerAngles.z:f2},{item.localScale.x:f2},{item.localScale.y:f2},{item.localScale.z:f2},{door.angleopen}");
+            writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.position.y:f2},{tr.eulerAngles.x:f2},{tr.eulerAngles.y:f2},{tr.eulerAngles.z:f2},{tr.localScale.x:f2},{tr.localScale.y:f2},{tr.localScale.z:f2},{door.angleopen}");
             writer.WritePropertyName("color");
-            Color32 ma = item.GetComponent<MeshRenderer>().material.color;
+            Color32 ma = tr.GetComponent<MeshRenderer>().material.color;
             writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
             writer.WritePropertyName("entity");
             writer.Write(door.Entity_id);
@@ -1306,41 +1358,43 @@ public class House : MonoBehaviour
         writer.WriteArrayEnd();
     }
 
-    private void Floor2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Floor2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("floor");
         writer.WriteArrayStart();
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.name);
+            writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
             writer.WritePropertyName("pos");
-            var sa = item.GetComponent<MeshRenderer>().material.GetTextureScale("_BaseMap");
-            writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.localScale.x * 10:f2},{item.localScale.z * 10:f2},{sa.x:f2},{sa.y:f2}");
+            var tr = item.Key;
+            var sa = tr.GetComponent<MeshRenderer>().material.GetTextureScale("_BaseMap");
+            writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.localScale.x * 10:f2},{tr.localScale.z * 10:f2},{sa.x:f2},{sa.y:f2}");
             writer.WritePropertyName("priority");
-            int a = Mathf.CeilToInt(item.position.y * 100);
+            int a = Mathf.CeilToInt(tr.position.y * 100);
             writer.Write(a);
             writer.WritePropertyName("color");
-            Color32 ma = item.GetComponent<MeshRenderer>().material.color;
+            Color32 ma = tr.GetComponent<MeshRenderer>().material.color;
             writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();
         }
         writer.WriteArrayEnd();
     }
-    private void Eye2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Eye2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("look");
         writer.WriteArrayStart();
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.name);
+            writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
             writer.WritePropertyName("pos");
-            var sa = item.GetComponent<Eye>();
-            writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.position.y:f2},{item.eulerAngles.x:f2},{item.eulerAngles.y:f2},{item.eulerAngles.z:f2},{item.localScale.x:f2},{item.localScale.y:f2},{item.localScale.z:f2}");
+            var tr = item.Key;
+            var sa = tr.GetComponent<Eye>();
+            writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.position.y:f2},{tr.eulerAngles.x:f2},{tr.eulerAngles.y:f2},{tr.eulerAngles.z:f2},{tr.localScale.x:f2},{tr.localScale.y:f2},{tr.localScale.z:f2}");
             writer.WritePropertyName("priority");
             writer.Write(sa.priority);
             writer.WritePropertyName("text");
@@ -1353,19 +1407,20 @@ public class House : MonoBehaviour
         }
         writer.WriteArrayEnd();
     }
-    private void Wall2Json(JsonWriter writer, IGrouping<HouseEntityType, Transform> group)
+    private void Wall2Json(JsonWriter writer, IGrouping<HouseEntityType, KeyValuePair<Transform, HouseEntityData>> group)
     {
         writer.WritePropertyName("wall");
         writer.WriteArrayStart();
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.name);
+            writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
             writer.WritePropertyName("pos");
-            writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.position.y:f2},{item.eulerAngles.y:f2},{item.localScale.x:f2},{item.localScale.y:f2},{item.localScale.z:f2}");
+            var tr = item.Key;
+            writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.position.y:f2},{tr.eulerAngles.y:f2},{tr.localScale.x:f2},{tr.localScale.y:f2},{tr.localScale.z:f2}");
             writer.WritePropertyName("color");
-            Color32 ma = item.GetComponent<MeshRenderer>().material.color;
+            Color32 ma = tr.GetComponent<MeshRenderer>().material.color;
             writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();

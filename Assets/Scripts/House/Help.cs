@@ -188,8 +188,6 @@ public class Help : MonoBehaviour
 
     public async Task<Texture2D> LoadTextureWWW(string url)
     {
-        if (!url.StartsWith("http"))
-            return null;
         System.Uri uri = new System.Uri(url);
         using (var request = UnityWebRequestTexture.GetTexture(uri))
         {

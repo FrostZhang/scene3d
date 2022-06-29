@@ -112,14 +112,14 @@ public class DrawWall : MonoBehaviour
         if (Mathf.Abs(size.x) > Mathf.Abs(size.z))
         {
             wall = await House.Instance.CreatWall(choose.key
-                                , $"{center.x},{oldpos.z},0,0,{Mathf.Abs(size.x)},1,0.125"
+                                , $"{center.x},{oldpos.z},0,0,{Mathf.Abs(size.x)},1,{size.z}"
                                 , "195,216,235,255"
                                 );
         }
         else
         {
             wall = await House.Instance.CreatWall(choose.key
-                    , $"{oldpos.x},{center.z},0,90,{Mathf.Abs(size.z)},1,0.125"
+                    , $"{oldpos.x},{center.z},0,90,{Mathf.Abs(size.z)},1,{size.z}"
                     , "195,216,235,255"
                     );
         }
