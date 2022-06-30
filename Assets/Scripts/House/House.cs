@@ -90,6 +90,8 @@ public class House : MonoBehaviour
         Instantiate(t, canvas);
         t = Resources.Load<Transform>("UI/DashangPanel");
         Instantiate(t, canvas);
+        t = Resources.Load<Transform>("UI/RunPanel");
+        Instantiate(t, canvas);
         Shijie.OnGetConfig += OnGetConfig;
         Shijie.OnHassFlush += OnHassFlush;
 #if UNITY_WEBGL && !UNITY_EDITOR

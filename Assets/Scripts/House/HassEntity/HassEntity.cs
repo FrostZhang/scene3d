@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,24 +6,24 @@ using UnityEngine;
 public class HassEntity : MonoBehaviour
 {
     public string Entity_id { get => entity_id; } //homeassitant entity ID
-    public Collider editC;  //½»»¥Ìå
+    public Collider editC;  //äº¤äº’ä½“
     protected string entity_id;
-    //const string switchkey = "switch";//¶Ô±ê homeassistant ×´Ì¬Ğ­Òé on off
-    //const string lightkey = "light";  //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé on off
-    //const string climate = "climate"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé on off
-    //const string binary_sensor = "binary_sensor"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé on off
-    //const string media_player = "media_player"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé idle
-    //const string person = "person"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé not_home
-    //const string cover = "cover"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé closed closing open opening
-    //const string fan = "fan"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé on off
-    const string on = "on"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé
-    const string off = "off"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé
-    protected const string undefine = "undefine"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé
+    //const string switchkey = "switch";//å¯¹æ ‡ homeassistant çŠ¶æ€åè®® on off
+    //const string lightkey = "light";  //å¯¹æ ‡ homeassistant çŠ¶æ€åè®® on off
+    //const string climate = "climate"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®® on off
+    //const string binary_sensor = "binary_sensor"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®® on off
+    //const string media_player = "media_player"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®® idle
+    //const string person = "person"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®® not_home
+    //const string cover = "cover"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®® closed closing open opening
+    //const string fan = "fan"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®® on off
+    const string on = "on"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®®
+    const string off = "off"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®®
+    protected const string undefine = "undefine"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®®
 
-    string head;    //todo ÓÉÓÃ»§Ìá¹©£¬ÔÚÃæ°å°ó¶¨ID»á±»½âÎö×÷ÎªÖ¸Áî·¢¸øhomeassitant£¬ÕâÀïÓĞbug£¡
-    const string cmdon = "turn_on"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé
-    const string cmdoff = "turn_off"; //¶Ô±ê homeassistant ×´Ì¬Ğ­Òé
-    protected bool open = false;    //»ñµÃ×´Ì¬£¬Ä¿Ç°Ö»½ÓÁËhomeassitant¿ª¹Ø¡£Ô­ÒòÈ«½ÓÊı¾İÁ¿¹ı´ó»¹Ã»ÓÅ»¯£¡
+    string head;    //todo ç”±ç”¨æˆ·æä¾›ï¼Œåœ¨é¢æ¿ç»‘å®šIDä¼šè¢«è§£æä½œä¸ºæŒ‡ä»¤å‘ç»™homeassitantï¼Œè¿™é‡Œæœ‰bugï¼
+    const string cmdon = "turn_on"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®®
+    const string cmdoff = "turn_off"; //å¯¹æ ‡ homeassistant çŠ¶æ€åè®®
+    protected bool open = false;    //è·å¾—çŠ¶æ€ï¼Œç›®å‰åªæ¥äº†homeassitantå¼€å…³ã€‚åŸå› å…¨æ¥æ•°æ®é‡è¿‡å¤§è¿˜æ²¡ä¼˜åŒ–ï¼
 
     /// <summary> bingding homeassistant </summary>
     public void SetEntity(string id)
@@ -86,12 +86,12 @@ public class HassEntity : MonoBehaviour
     /// <summary>from hass message open cmd</summary>
     protected virtual void TrunOn()
     {
-
+        RunPanel.instance.Show(transform, "On!");
     }
     /// <summary>from hass message close cmd</summary>
     protected virtual void TrunOff()
     {
-
+        RunPanel.instance.Show(transform, "Off!");
     }
     /// <summary>from hass message. not on/off</summary>
     protected virtual void Destine(string state)

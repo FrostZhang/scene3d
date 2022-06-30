@@ -29,6 +29,7 @@ public class TVEntity : HassEntity
     }
     protected override void TrunOn()
     {
+        base.TrunOn();
         if (!onOnj.activeSelf)
         {
             onOnj.SetActive(true);
