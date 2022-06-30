@@ -9,8 +9,10 @@ public class CreatPanel : MonoBehaviour
     public static CreatPanel Instance;
     public RawImage icon;
     public Transform btns, panels;
-    public Button addmodeurl;
     public Dictionary<string, List<Ziyuan>> zdic { get; private set; }
+
+    public WWWResource wwwResource;
+    Button wwwbtn;
     public class Ziyuan
     {
         public string root;
@@ -52,10 +54,15 @@ public class CreatPanel : MonoBehaviour
             });
         }
         Show(false);
-        addmodeurl.onClick.AddListener(() =>
-        {
+        wwwbtn = bs[0];
+        wwwbtn.gameObject.SetActive(false);
+    }
 
-        });
+    public WWWResource EnableWWWPanle()
+    {
+        wwwbtn.gameObject.SetActive(true);
+        wwwbtn.onClick.Invoke();
+        return wwwResource;
     }
 
     public void Show(bool b)
@@ -168,4 +175,5 @@ public class CreatPanel : MonoBehaviour
             }
         }
     }
+
 }

@@ -31,10 +31,17 @@ public class AddModelPanel : MonoBehaviour
         });
         add.onClick.AddListener(() =>
         {
-
+            if (loadUrl != null)
+            {
+                var wr = CreatPanel.Instance.EnableWWWPanle();
+                wr.Add(loadUrl, loadteurl, loadType);
+                Destroy(gameObject);
+            }
         });
     }
 
+    HouseEntityType loadType;
+    string loadUrl, loadteurl;
     public async void Ans(string url)
     {
         verifyUrl = null;
@@ -64,27 +71,41 @@ public class AddModelPanel : MonoBehaviour
                 var bs = bundle.LoadAllAssets();
                 if (bs != null && bs.Length > 0)
                 {
-                    if (verify(nandt[1], bs[0]))
+                    if (verify(nandt[1], bs[0], out loadType))
                     {
                         verifyUrl = url;
                         var te = await Help.Instance.LoadTextureWWW(imagepath);
                         if (!gameObject)
                             return;
-                        preiew.texture = te;
+                        if (te)
+                        {
+                            preiew.texture = te;
+                            loadteurl = imagepath;
+                        }
+                        else
+                        {
+                            loadteurl = null;
+                        }
                         err.text = "Load success";
                         cgroup.interactable = true;
+                        loadUrl = url;
                         return;
+                    }
+                    else
+                    {
+                        loadUrl = url;
+                        loadteurl = null;
                     }
                 }
             }
             err.text = "Load failed";
         }
-        else if (url.StartsWith("/"))
+        else if (url.StartsWith("/") && url.EndsWith(".asherlinkdata"))
         {
-            url = Help.Instance.CombineCustomdataPath(url.Remove(0, 1));
-            url = url.Replace("\\", "/");
-            var filename = url.Substring(url.LastIndexOf("/"));
-            var filenameWE = filename.Remove(url.IndexOf("."));
+            var cusurl = Help.Instance.CombineCustomdataPath(url.Remove(0, 1));
+            cusurl = cusurl.Replace("\\", "/");
+            var filename = url.Substring(url.LastIndexOf("/") + 1);
+            var filenameWE = filename.Remove(filename.IndexOf("."));
             if (filenameWE.Length < 3)
             {
                 err.text = "File naming is not standardized.the format should be like bed_stand,fan_appliances";
@@ -96,25 +117,40 @@ public class AddModelPanel : MonoBehaviour
                 return;
             }
             cgroup.interactable = false;
-            var bundle = await Help.Instance.LoadAsherlinkdataInWWW(url, new System.Uri(url));
+            var bundle = await Help.Instance.LoadAsherlinkdataInWWW(cusurl, new System.Uri(cusurl));
             if (!gameObject)
                 return;
             if (bundle != null)
             {
-                var imagepath = url.Remove(url.LastIndexOf("/") + 1) + nandt[0] + ".png";
+                var cuspang = url.Remove(url.LastIndexOf("/") + 1) + nandt[0] + ".png";
+                var imagepath = Help.Instance.CombineCustomdataPath(cuspang);
                 var bs = bundle.LoadAllAssets();
                 if (bs != null && bs.Length > 0)
                 {
-                    if (verify(nandt[1], bs[0]))
+                    if (verify(nandt[1], bs[0], out loadType))
                     {
                         verifyUrl = url;
                         var te = await Help.Instance.LoadTextureWWW(imagepath);
                         if (!gameObject)
                             return;
-                        preiew.texture = te;
+                        if (te)
+                        {
+                            preiew.texture = te;
+                            loadteurl = cuspang;
+                        }
+                        else
+                        {
+                            loadteurl = null;
+                        }
                         err.text = "Load success";
                         cgroup.interactable = true;
+                        loadUrl = url;
                         return;
+                    }
+                    else
+                    {
+                        loadUrl = url;
+                        loadteurl = null;
                     }
                 }
             }
@@ -123,10 +159,10 @@ public class AddModelPanel : MonoBehaviour
         cgroup.interactable = true;
     }
 
-    private bool verify(string ty, Object wwwR)
+    private bool verify(string ty, Object wwwR, out HouseEntityType entityType)
     {
         var t = Help.Instance.string2HouseEntityType(ty);
-
+        entityType = t;
         switch (t)
         {
             case HouseEntityType.wall:

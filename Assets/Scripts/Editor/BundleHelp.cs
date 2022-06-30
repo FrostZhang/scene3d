@@ -56,7 +56,7 @@ public class BundleHelp : EditorWindow
         //ReadWall();
         //ReadLine();
 
-        ReadPreviewTex();
+        //ReadPreviewTex();
 
         ReadDependencie();
     }
@@ -160,12 +160,12 @@ public class BundleHelp : EditorWindow
         }
     }
 
-   async  void ReadPreviewTex()
+    async void ReadPreviewTex()
     {
         if (GUILayout.Button("‘∆“Ù¿÷"))
         {
             DownloadHandlerBuffer downloadHandler = new DownloadHandlerBuffer();
-             UnityWebRequest unityWebRequest = new UnityWebRequest("https://music.163.com/#/playlist?id=7280347904");
+            UnityWebRequest unityWebRequest = new UnityWebRequest("https://music.163.com/#/playlist?id=7280347904");
             {
                 unityWebRequest.downloadHandler = downloadHandler;
                 await unityWebRequest.SendWebRequest();
@@ -231,6 +231,7 @@ public class BundleHelp : EditorWindow
 
     GameObject go;
     Dictionary<Object, bool> dic;
+    Vector2 scp;
     void ReadDependencie()
     {
         go = EditorGUILayout.ObjectField(go, typeof(GameObject), true) as GameObject;
@@ -266,43 +267,47 @@ public class BundleHelp : EditorWindow
                     }
                 }
             }
-            foreach (var item in ks)
+            using (var s = new GUILayout.ScrollViewScope(scp))
             {
-                if (item.GetType() == typeof(Material))
+                scp = s.scrollPosition;
+                foreach (var item in ks)
                 {
-                    using (new GUILayout.HorizontalScope())
+                    if (item.GetType() == typeof(Material))
                     {
-                        dic[item] = EditorGUILayout.Toggle(dic[item]);
-                        EditorGUILayout.ObjectField(item, typeof(Material), false);
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            dic[item] = EditorGUILayout.Toggle(dic[item]);
+                            EditorGUILayout.ObjectField(item, typeof(Material), false);
+                        }
                     }
-                }
-                else if (item.GetType() == typeof(Texture2D))
-                {
-                    using (new GUILayout.HorizontalScope())
+                    else if (item.GetType() == typeof(Texture2D))
                     {
-                        dic[item] = EditorGUILayout.Toggle(dic[item]);
-                        EditorGUILayout.ObjectField(item, typeof(Texture2D), false);
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            dic[item] = EditorGUILayout.Toggle(dic[item]);
+                            EditorGUILayout.ObjectField(item, typeof(Texture2D), false);
+                        }
                     }
-                }
-                else if (item.GetType() == typeof(GameObject))
-                {
-                    using (new GUILayout.HorizontalScope())
+                    else if (item.GetType() == typeof(GameObject))
                     {
-                        dic[item] = EditorGUILayout.Toggle(dic[item]);
-                        EditorGUILayout.ObjectField(item, typeof(GameObject), false);
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            dic[item] = EditorGUILayout.Toggle(dic[item]);
+                            EditorGUILayout.ObjectField(item, typeof(GameObject), false);
+                        }
                     }
-                }
-                else if (item.GetType() == typeof(Shader))
-                {
-                    using (new GUILayout.HorizontalScope())
+                    else if (item.GetType() == typeof(Shader))
                     {
-                        dic[item] = EditorGUILayout.Toggle(dic[item]);
-                        EditorGUILayout.ObjectField(item, typeof(Shader), false);
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            dic[item] = EditorGUILayout.Toggle(dic[item]);
+                            EditorGUILayout.ObjectField(item, typeof(Shader), false);
+                        }
                     }
-                }
-                else
-                {
-                    dic[item] = false;
+                    else
+                    {
+                        dic[item] = false;
+                    }
                 }
             }
         }

@@ -6,8 +6,6 @@ using UnityEngine;
 public class HassEntity : MonoBehaviour
 {
     public string Entity_id { get => entity_id; } //homeassitant entity ID
-    public string Supplier { get; set; } //资源来源，当为null由本软件开发者提供
-    public string Url { get; set; }
     public Collider editC;  //交互体
     protected string entity_id;
     //const string switchkey = "switch";//对标 homeassistant 状态协议 on off

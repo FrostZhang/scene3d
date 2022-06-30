@@ -722,8 +722,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2b245757ae68094d8c3d3c347da8aae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  togPrefab: {fileID: 0}
-  dragPrefab: {fileID: 0}
+  togPrefab: {fileID: 4053035673779007787}
+  dragPrefab: {fileID: 769793755681470184}
 --- !u!1 &4053035674860055261
 GameObject:
   m_ObjectHideFlags: 0
@@ -919,8 +919,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4053035674860055263}
   m_HandleRect: {fileID: 4053035674860055262}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 0.9719476
+  m_Value: -0.0000031082445
+  m_Size: 0.9719478
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
