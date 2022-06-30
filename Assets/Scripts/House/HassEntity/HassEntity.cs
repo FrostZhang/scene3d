@@ -86,12 +86,12 @@ public class HassEntity : MonoBehaviour
     /// <summary>from hass message open cmd</summary>
     protected virtual void TrunOn()
     {
-        RunPanel.instance.Show(transform, "On!");
+        
     }
     /// <summary>from hass message close cmd</summary>
     protected virtual void TrunOff()
     {
-        RunPanel.instance.Show(transform, "Off!");
+        
     }
     /// <summary>from hass message. not on/off</summary>
     protected virtual void Destine(string state)

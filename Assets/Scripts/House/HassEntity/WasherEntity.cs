@@ -14,11 +14,13 @@ public class WasherEntity : HassEntity
     protected override void TrunOn()
     {
         base.TrunOn();
+        RunPanel.instance.Show(transform, "Washer On");
     }
 
     protected override void TrunOff()
     {
         base.TrunOff();
+        RunPanel.instance.Show(transform, "Washer Off");
     }
 
     float interval = 3;

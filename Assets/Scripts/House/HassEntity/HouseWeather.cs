@@ -85,6 +85,7 @@ public class HouseWeather : HassEntity
         if (lastWeather == str)
             return;
         lastWeather = str;
+        RunPanel.instance.Show(transform, str);
         SetRain(0);
         SetSnow(0);
         SetLighting(0);

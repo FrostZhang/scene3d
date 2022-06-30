@@ -24,12 +24,14 @@ public class DoorEntitySliding : DoorEntity
     {
         StopAllCoroutines();
         coroutine = StartCoroutine(To(angleopen));
+        RunPanel.instance.Show(transform, "Door On!");
     }
 
     protected override void TrunOff()
     {
         StopAllCoroutines();
         coroutine = StartCoroutine(To(angleclose));
+        RunPanel.instance.Show(transform, "Door Off!");
     }
 
     IEnumerator To(float f)

@@ -213,11 +213,11 @@ public class PropPanle : MonoBehaviour
         {
             if (pSColor.OnColorChanged != null)
             {
-                pSColor.gameObject.SetActive(false);
+                pSColor.transform.parent.gameObject.SetActive(false);
                 pSColor.OnColorChanged = null;
                 return;
             }
-            pSColor.gameObject.SetActive(true);
+            pSColor.transform.parent.gameObject.SetActive(true);
             pSColor.OnColorChanged = (x) =>
             {
                 actc?.Invoke(x);
@@ -237,7 +237,7 @@ public class PropPanle : MonoBehaviour
         }
         trs.Clear();
         fs.Clear();
-        pSColor.gameObject.SetActive(false);
+        pSColor.transform.parent.gameObject.SetActive(false);
         pSColor.OnColorChanged = null;
         ButtonList.Instance.Show(false, null);
         return this;
@@ -246,7 +246,7 @@ public class PropPanle : MonoBehaviour
     public void Show(bool b)
     {
         gameObject.SetActive(b);
-        pSColor.gameObject.SetActive(false);
+        pSColor.transform.parent.gameObject.SetActive(false);
         pSColor.OnColorChanged = null;
         ButtonList.Instance.Show(false, null);
     }

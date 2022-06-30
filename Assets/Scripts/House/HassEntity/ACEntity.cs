@@ -20,11 +20,13 @@ public class ACEntity : HassEntity
     }
     protected override void TrunOn()
     {
+        RunPanel.instance.Show(transform, "AC On!");
         eff.SetActive(true);
     }
 
     protected override void TrunOff()
     {
+        RunPanel.instance.Show(transform, "AC Off!");
         eff.SetActive(false);
     }
     public override void ReconstitutionMode(bool enter)

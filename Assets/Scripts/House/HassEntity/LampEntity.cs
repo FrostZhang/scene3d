@@ -28,11 +28,13 @@ public class LampEntity : HassEntity
         c.g *= 2;
         c.b *= 2;
         mr.material.SetColor("_EmissionColor", c);
+        RunPanel.instance.Show(transform, "Lamp On");
     }
 
     protected override void TrunOff()
     {
         mr.material.SetColor("_EmissionColor", Color.black);
+        RunPanel.instance.Show(transform, "Lamp Off");
     }
 
     public override void ReconstitutionMode(bool enter)

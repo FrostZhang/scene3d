@@ -36,12 +36,14 @@ public class LightEntity : HassEntity
     {
         StopAllCoroutines();
         coroutine = StartCoroutine(To(max));
+        RunPanel.instance.Show(transform, "Light On");
     }
 
     protected override void TrunOff()
     {
         StopAllCoroutines();
         coroutine = StartCoroutine(To(0));
+        RunPanel.instance.Show(transform, "Light Off");
     }
 
     public override void ReconstitutionMode(bool enter)

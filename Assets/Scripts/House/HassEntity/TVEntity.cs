@@ -34,12 +34,14 @@ public class TVEntity : HassEntity
         {
             onOnj.SetActive(true);
             StartCoroutine(AnimText());
+            RunPanel.instance.Show(transform, "TV On");
         }
     }
 
     protected override void TrunOff()
     {
         onOnj.SetActive(false);
+        RunPanel.instance.Show(transform, "TV Off");
     }
 
     public override void ReconstitutionMode(bool enter)

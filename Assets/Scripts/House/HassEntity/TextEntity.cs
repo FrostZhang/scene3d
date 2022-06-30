@@ -21,20 +21,29 @@ public class TextEntity : HassEntity
     }
     protected override void Destine(string state)
     {
-        value = state;
-        FlushText();
+        if (value != state)
+        {
+            value = state;
+            FlushText();
+        }
     }
 
     protected override void TrunOn()
     {
-        value = "On";
-        FlushText();
+        if (value != "On")
+        {
+            value = "On";
+            FlushText();
+        }
     }
 
     protected override void TrunOff()
     {
-        value = "Off";
-        FlushText();
+        if (value != "Off")
+        {
+            value = "Off";
+            FlushText();
+        }
     }
 
     public override void ReconstitutionMode(bool enter)
@@ -53,5 +62,6 @@ public class TextEntity : HassEntity
     internal void FlushText()
     {
         textMesh.text = front + value + back;
+        RunPanel.instance.Show(transform, textMesh.text);
     }
 }

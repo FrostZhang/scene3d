@@ -6,7 +6,7 @@ public class FunEntity : HassEntity
 {
     public Transform fan;
     Coroutine coroutine;
-    public GameObject  high;
+    public GameObject high;
     void Awake()
     {
         high.SetActive(false);
@@ -24,6 +24,7 @@ public class FunEntity : HassEntity
         if (coroutine == null)
         {
             coroutine = StartCoroutine(Run());
+            RunPanel.instance.Show(transform, "Fun On!");
         }
     }
 
@@ -32,6 +33,7 @@ public class FunEntity : HassEntity
         if (coroutine != null)
         {
             StopCoroutine(coroutine);
+            RunPanel.instance.Show(transform, "Fun Off!");
             coroutine = null;
         }
     }
