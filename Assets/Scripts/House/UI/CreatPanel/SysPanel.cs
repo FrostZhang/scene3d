@@ -15,7 +15,7 @@ public class SysPanel : MonoBehaviour
         save.onClick.AddListener(Save);
         weather.onClick.AddListener(() =>
         {
-            ButtonList.Instance.Show(true, (n) =>
+           CreatPanel.Instance.entityListPanel.Show(true, (n) =>
             {
                 weather.GetComponentInChildren<Text>().text = n;
                 HouseWeather.Instance.SetEntity(n);

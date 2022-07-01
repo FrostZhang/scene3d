@@ -28,7 +28,6 @@ public class Reconstitution : MonoBehaviour
         //caTr = mainCa.transform;
         rigTr = CameraControllerForUnity.Instance.transform;
         ligizmo = new List<RTEditor.Gizmo>(5);
-        PropPanle.Instance.Ondel += OnDelete;
     }
 
     private void OnDelete()
@@ -82,11 +81,19 @@ public class Reconstitution : MonoBehaviour
             }
             //BoundsPanel.Instance.Bingding(null, null);
             CloseRTEditor();
-            CreatPanel.Instance.Show(false);
+            if (CreatPanel.Instance)
+                Destroy(CreatPanel.Instance.gameObject);
+            if (PropPanle.Instance)
+                Destroy(PropPanle.Instance.gameObject);
+            Resources.UnloadUnusedAssets();
             return;
         }
         isEdit = true;
-        CreatPanel.Instance.Show(true);
+        var t = Resources.Load<Transform>("UI/CreatPanel");
+        Instantiate(t, House.Instance.canvas);
+        t = Resources.Load<Transform>("UI/PropPanle");
+        Instantiate(t, House.Instance.canvas);
+        PropPanle.Instance.Ondel += OnDelete;
         rigTr.position = new Vector3(0, -1, 0);
         CameraControllerForUnity.Instance.MobaFollow_orthogonal(rigTr, new Vector2(90, 0), 15, 5);
         CameraControllerForUnity.Instance.orthographicSizeLimit = new Vector2(2, 10);
@@ -110,9 +117,7 @@ public class Reconstitution : MonoBehaviour
                 }
             }
         }
-
         OpenRTEditor();
-
     }
 
 

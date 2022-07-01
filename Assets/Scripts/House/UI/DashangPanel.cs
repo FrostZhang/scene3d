@@ -11,8 +11,7 @@ public class DashangPanel : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        bj.onClick.AddListener(() => gameObject.SetActive(false));
-        gameObject.SetActive(false);
+        bj.onClick.AddListener(() => Destroy(gameObject));
         coffee.onClick.AddListener(() => Application.OpenURL("https://www.buymeacoffee.com/3762375193"));
     }
 }

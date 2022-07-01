@@ -3,23 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ButtonList : MonoBehaviour
+public class EntityListPanel : MonoBehaviour
 {
-    public Button prefab;
+    public Button prefab; 
     List<Button> buttons;
     System.Action<string> callback;
 
-    private static ButtonList instance;
     Button self;
-    public static ButtonList Instance
-    {
-        get { return instance; }
-    }
-
     void Awake()
     {
-        if (instance == null)
-            instance = this;
         self = GetComponent<Button>();
         self.onClick.AddListener(() =>
         {

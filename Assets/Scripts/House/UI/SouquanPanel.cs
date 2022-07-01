@@ -10,7 +10,6 @@ public class SouquanPanel : MonoBehaviour
     private void Awake()
     {
         instance = this;
-        bj.onClick.AddListener(() => gameObject.SetActive(false));
-        gameObject.SetActive(false);
+        bj.onClick.AddListener(() => Destroy(gameObject));
     }
 }

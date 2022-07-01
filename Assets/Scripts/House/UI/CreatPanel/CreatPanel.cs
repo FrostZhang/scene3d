@@ -10,6 +10,7 @@ public class CreatPanel : MonoBehaviour
     public RawImage icon;
     public Transform btns, panels;
     public Dictionary<string, List<Ziyuan>> zdic { get; private set; }
+    public EntityListPanel entityListPanel { get; private set; }
 
     public WWWResource wwwResource;
     Button wwwbtn;
@@ -28,6 +29,15 @@ public class CreatPanel : MonoBehaviour
     {
         Instance = this;
         zdic = new Dictionary<string, List<Ziyuan>>(200);
+        var t = Resources.Load<EntityListPanel>("UI/EntityListPanel");
+        entityListPanel = Instantiate(t, House.Instance.canvas);
+    }
+
+    void OnDestroy()
+    {
+        Instance = null;
+        Destroy(entityListPanel.gameObject);
+        entityListPanel = null;
     }
 
     void Start()
@@ -53,7 +63,6 @@ public class CreatPanel : MonoBehaviour
                 }
             });
         }
-        Show(false);
         wwwbtn = bs[0];
         wwwbtn.gameObject.SetActive(false);
     }

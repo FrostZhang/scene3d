@@ -20,7 +20,8 @@ public class PropPanle : MonoBehaviour
     List<Transform> trs;
     List<InputField> fs;
     public Action Ondel;
-    void Start()
+
+    void Awake()
     {
         Instance = this;
         trs = new List<Transform>(10);
@@ -38,6 +39,11 @@ public class PropPanle : MonoBehaviour
         });
     }
 
+    void OnDestroy()
+    {
+        Instance = null;
+        Ondel = null;
+    }
     void OnEnable()
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -103,7 +109,7 @@ public class PropPanle : MonoBehaviour
         var idt = ff.GetComponentInChildren<Text>();
         ff.onClick.AddListener(() =>
         {
-            ButtonList.Instance.Show(true, (n) =>
+            CreatPanel.Instance.entityListPanel.Show(true, (n) =>
             {
                 idt.text = n;
                 act?.Invoke(n);
@@ -239,7 +245,7 @@ public class PropPanle : MonoBehaviour
         fs.Clear();
         pSColor.transform.parent.gameObject.SetActive(false);
         pSColor.OnColorChanged = null;
-        ButtonList.Instance.Show(false, null);
+        CreatPanel.Instance.entityListPanel.Show(false, null);
         return this;
     }
 
@@ -248,7 +254,7 @@ public class PropPanle : MonoBehaviour
         gameObject.SetActive(b);
         pSColor.transform.parent.gameObject.SetActive(false);
         pSColor.OnColorChanged = null;
-        ButtonList.Instance.Show(false, null);
+        CreatPanel.Instance.entityListPanel.Show(false, null);
     }
 
     public void Flush(int[] index, params float[] values)

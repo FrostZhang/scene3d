@@ -93,6 +93,7 @@ public class RunPanel : MonoBehaviour
             line.Draw();
             yield return new WaitForEndOfFrame();
         }
+        line.points2[2] = end.position;
         end.gameObject.SetActive(true);
         end.GetComponentInChildren<Text>().text = mes;
         t = 0;

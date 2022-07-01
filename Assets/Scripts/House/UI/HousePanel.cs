@@ -101,11 +101,19 @@ public class HousePanel : MonoBehaviour
         });
         CameraControllerForUnity.Instance.roOrMove = roOrMove.isOn;
 
-
-       info.onClick.AddListener(() => SouquanPanel.instance.gameObject.SetActive(true));
-        zanzu.onClick.AddListener(() => DashangPanel.instance.gameObject.SetActive(true));
+        info.onClick.AddListener(() =>
+        {
+            var t = Resources.Load<Transform>("UI/SouquanPanel");
+            Instantiate(t, House.Instance.canvas);
+        });
+        zanzu.onClick.AddListener(() =>
+        {
+            var t = Resources.Load<Transform>("UI/DashangPanel");
+            Instantiate(t, House.Instance.canvas);
+        });
         if (Shijie.WhichStand() == 1)
         {
+            HouseWeather.Instance.mainlight.shadows = LightShadows.None;
             edit.interactable = false;
         }
         else

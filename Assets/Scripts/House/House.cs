@@ -15,14 +15,13 @@ public class HouseEntityData
 {
     public string shortname;
     public HouseEntityType entityType;
+    public string supplier;
+    public string url;
 
     public HouseEntityData(HouseEntityType entityType)
     {
         this.entityType = entityType;
     }
-
-    public string supplier;
-    public string url;
 
     public HouseEntityData(string url)
     {
@@ -86,11 +85,7 @@ public class House : MonoBehaviour
 
     void Start()
     {
-        var t = Resources.Load<Transform>("UI/SouquanPanel");
-        Instantiate(t, canvas);
-        t = Resources.Load<Transform>("UI/DashangPanel");
-        Instantiate(t, canvas);
-        t = Resources.Load<Transform>("UI/RunPanel");
+        var t = Resources.Load<Transform>("UI/RunPanel");
         Instantiate(t, canvas);
         Shijie.OnGetConfig += OnGetConfig;
         Shijie.OnHassFlush += OnHassFlush;
@@ -1012,11 +1007,17 @@ public class House : MonoBehaviour
             var canshu = door[cusname];
             var dic = canshu as IDictionary;
             if (dic == null) return;
-            string pos = null, color = null;
+            string pos = null, color = null, url = null;
             if (dic.Contains("pos"))
                 pos = dic["pos"]?.ToString();
             if (dic.Contains("color"))
                 color = dic["color"]?.ToString();
+            if (dic.Contains("url"))
+                url = dic["url"]?.ToString();
+            if (url != null)
+            {
+
+            }
             CreatStand(cusname, pos, color);
         });
     }
@@ -1380,6 +1381,11 @@ public class House : MonoBehaviour
             writer.WritePropertyName("color");
             Color32 ma = tr.GetComponent<MeshRenderer>().material.color;
             writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
+            if (!string.IsNullOrEmpty(item.Value.url))
+            {
+                writer.WritePropertyName("url");
+                writer.Write(item.Value.url);
+            }
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();
         }
@@ -1405,6 +1411,11 @@ public class House : MonoBehaviour
             //writer.WritePropertyName("color");
             //Color32 ma = item.GetComponent<MeshRenderer>().material.color;
             //writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
+            if (!string.IsNullOrEmpty(item.Value.url))
+            {
+                writer.WritePropertyName("url");
+                writer.Write(item.Value.url);
+            }
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();
         }
@@ -1425,6 +1436,11 @@ public class House : MonoBehaviour
             writer.WritePropertyName("color");
             Color32 ma = tr.GetComponent<MeshRenderer>().material.color;
             writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
+            if (!string.IsNullOrEmpty(item.Value.url))
+            {
+                writer.WritePropertyName("url");
+                writer.Write(item.Value.url);
+            }
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();
         }
