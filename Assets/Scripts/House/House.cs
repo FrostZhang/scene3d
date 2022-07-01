@@ -1044,7 +1044,6 @@ public class House : MonoBehaviour
         });
     }
 
-
     private void AnsDoor(JsonData jd)
     {
         var doors = jd["door"];
