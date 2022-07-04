@@ -384,6 +384,18 @@ public class Reconstitution : MonoBehaviour
                 e.textMesh.fontSize = (int)x;
             });
         }
+        else if (door is CoverEntity)
+        {
+            var e = door as CoverEntity;
+            PropPanle.Instance.GetV1("Open", e.angleopen, (x) =>
+            {
+                e.angleopen = x;
+            });
+            PropPanle.Instance.GetV1("Close", e.angleclose, (x) =>
+            {
+                e.angleclose = x;
+            });
+        }
         PropPanle.Instance.GetEntity("ID", door.Entity_id, (x) =>
         {
             door.SetEntity(x);

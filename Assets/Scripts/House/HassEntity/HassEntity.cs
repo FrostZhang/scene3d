@@ -91,7 +91,7 @@ public class HassEntity : MonoBehaviour
         
     }
     /// <summary>from hass message. not on/off</summary>
-    protected virtual void Destine(string state)
+    protected virtual void HassDestine(string state)
     {
 
     }
@@ -119,7 +119,7 @@ public class HassEntity : MonoBehaviour
     {
         if (state == lastState)
             return;
-        state = lastState;
+        lastState = state;
         if (state == on)
         {
             if (!open)
@@ -140,7 +140,7 @@ public class HassEntity : MonoBehaviour
         }
         else
         {
-            Destine(state);
+            HassDestine(state);
         }
     }
 

@@ -19,7 +19,7 @@ public class TextEntity : HassEntity
         FlushText();
         editC.enabled = false;
     }
-    protected override void Destine(string state)
+    protected override void HassDestine(string state)
     {
         if (value != state)
         {

@@ -75,7 +75,7 @@ public class HouseWeather : HassEntity
         var m = lmain.main;
         m.maxParticles = (int)value;
     }
-    protected override void Destine(string state)
+    protected override void HassDestine(string state)
     {
         if (ready)
             SetWeather(state);
