@@ -10,9 +10,4 @@ public class EyeEntity : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

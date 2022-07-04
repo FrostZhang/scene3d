@@ -5,7 +5,6 @@ using UnityEngine;
 public class FunEntity : HassEntity
 {
     public Transform fan;
-    Coroutine coroutine;
     public GameObject high;
     void Awake()
     {
@@ -21,45 +20,41 @@ public class FunEntity : HassEntity
     }
     protected override void TrunOn()
     {
-        if (coroutine == null)
-        {
-            coroutine = StartCoroutine(Run());
-            RunPanel.instance.Show(transform, "Fun On!");
-        }
+        StopAllCoroutines();
+        StartCoroutine(Run());
     }
 
     protected override void TrunOff()
     {
-        if (coroutine != null)
-        {
-            StopCoroutine(coroutine);
-            RunPanel.instance.Show(transform, "Fun Off!");
-            coroutine = null;
-        }
+        StopAllCoroutines();
     }
-
+    protected override void HassStateOn()
+    {
+        RunPanel.instance.Show(transform, "Fun On!");
+    }
+    protected override void HassStateOff()
+    {
+        RunPanel.instance.Show(transform, "Fun Off!");
+    }
     public override void ReconstitutionMode(bool enter)
     {
         if (enter)
         {
-            if (coroutine != null)
-            {
-                StopCoroutine(coroutine);
-                coroutine = null;
-            }
+            StopAllCoroutines();
         }
         else
         {
             if (open)
             {
-                coroutine = StartCoroutine(Run());
+                StopAllCoroutines();
+                StartCoroutine(Run());
             }
         }
     }
 
     IEnumerator Run()
     {
-        while (true)
+        while (transform)
         {
             var e = fan.eulerAngles;
             e.y += 1;

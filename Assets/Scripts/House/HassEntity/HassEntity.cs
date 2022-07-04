@@ -24,7 +24,7 @@ public class HassEntity : MonoBehaviour
     const string cmdon = "turn_on"; //对标 homeassistant 状态协议
     const string cmdoff = "turn_off"; //对标 homeassistant 状态协议
     protected bool open = false;    //获得状态，目前只接了homeassitant开关。原因全接数据量过大还没优化！
-
+    string lastState;
     /// <summary> bingding homeassistant </summary>
     public void SetEntity(string id)
     {
@@ -82,13 +82,10 @@ public class HassEntity : MonoBehaviour
     {
 
     }
-
-    /// <summary>from hass message open cmd</summary>
     protected virtual void TrunOn()
     {
         
     }
-    /// <summary>from hass message close cmd</summary>
     protected virtual void TrunOff()
     {
         
@@ -105,14 +102,30 @@ public class HassEntity : MonoBehaviour
 
     }
 
+    /// <summary>from hass message open cmd</summary>
+    protected virtual void HassStateOn()
+    {
+        
+    }
+
+    /// <summary>from hass message close cmd</summary>
+    protected virtual void HassStateOff()
+    {
+
+    }
+
     /// <summary> from hass message ans: on/off/other</summary>
     public void StateMeassge(string state)
     {
+        if (state == lastState)
+            return;
+        state = lastState;
         if (state == on)
         {
             if (!open)
             {
                 open = true;
+                HassStateOn();
                 TrunOn();
             }
         }
@@ -121,6 +134,7 @@ public class HassEntity : MonoBehaviour
             if (open)
             {
                 open = false;
+                HassStateOff();
                 TrunOff();
             }
         }

@@ -29,21 +29,25 @@ public class TVEntity : HassEntity
     }
     protected override void TrunOn()
     {
-        base.TrunOn();
         if (!onOnj.activeSelf)
         {
             onOnj.SetActive(true);
             StartCoroutine(AnimText());
-            RunPanel.instance.Show(transform, "TV On");
         }
     }
 
     protected override void TrunOff()
     {
         onOnj.SetActive(false);
-        RunPanel.instance.Show(transform, "TV Off");
     }
-
+    protected override void HassStateOn()
+    {
+        RunPanel.instance.Show(transform, "TV On!");
+    }
+    protected override void HassStateOff()
+    {
+        RunPanel.instance.Show(transform, "TV Off!");
+    }
     public override void ReconstitutionMode(bool enter)
     {
         //onOnj.SetActive(enter);

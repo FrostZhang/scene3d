@@ -31,7 +31,14 @@ public class AlarmEntity : HassEntity
         line.gameObject.SetActive(false);
         HouseWeather.Instance.SetInDanger(false);
     }
-
+    protected override void HassStateOn()
+    {
+        RunPanel.instance.Show(transform, "Alarm On!");
+    }
+    protected override void HassStateOff()
+    {
+        RunPanel.instance.Show(transform, "Alarm Off!");
+    }
     public override void ReconstitutionMode(bool enter)
     {
         base.ReconstitutionMode(enter);

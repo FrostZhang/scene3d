@@ -13,37 +13,34 @@ public class WasherEntity : HassEntity
     }
     protected override void TrunOn()
     {
-        base.TrunOn();
-        RunPanel.instance.Show(transform, "Washer On");
+        StopAllCoroutines();
+        StartCoroutine(Anim());
     }
-
     protected override void TrunOff()
     {
-        base.TrunOff();
-        RunPanel.instance.Show(transform, "Washer Off");
+        StopAllCoroutines();
+    }
+    protected override void HassStateOn()
+    {
+        RunPanel.instance.Show(transform, "Washer On!");
+    }
+    protected override void HassStateOff()
+    {
+        RunPanel.instance.Show(transform, "Washer Off!");
     }
 
     float interval = 3;
-    float _interval;
-    void Update()
-    {
-        if (open)
-        {
-            if ((_interval -= Time.deltaTime) < 0)
-            {
-                _interval = interval;
-                StartCoroutine(Anim());
-            }
-        }
-    }
-
     IEnumerator Anim()
     {
-        for (int i = 0; i < 5; i++)
+        while (transform)
         {
-            transform.eulerAngles += UnityEngine.Random.onUnitSphere * 2;
-            yield return new WaitForSeconds(0.1f);
+            for (int i = 0; i < 5; i++)
+            {
+                transform.eulerAngles += UnityEngine.Random.onUnitSphere * 2;
+                yield return new WaitForSeconds(0.1f);
+            }
+            transform.eulerAngles = e;
+            yield return new WaitForSeconds(interval);
         }
-        transform.eulerAngles = e;
     }
 }
