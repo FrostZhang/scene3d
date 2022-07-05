@@ -4,24 +4,26 @@ using UnityEngine;
 
 public class CoverEntity : HassEntity
 {
-    public float angleclose, angleopen;
-
+    public float scaleFilter = 1.47f;
+    /// <summary>¿ª </summary>
+    public float openW;
+    public Transform left, right;
     protected virtual void Start()
     {
-        GetComponent<BoxCollider>().enabled = false;
-        angleclose = transform.localScale.x;
-        TrunOff();
+        if (openW > transform.localScale.x || openW <= 0)
+            openW = transform.localScale.x - 0.1f;
+        GetComponent<Collider>().enabled = true;
     }
 
     protected override void TrunOn()
     {
         StopAllCoroutines();
-        StartCoroutine(To(angleopen));
+        StartCoroutine(To(openW));
     }
     protected override void TrunOff()
     {
         StopAllCoroutines();
-        StartCoroutine(To(angleclose));
+        StartCoroutine(To(0));
     }
     protected override void HassStateOn()
     {
@@ -36,10 +38,15 @@ public class CoverEntity : HassEntity
         float t = 1 / 2f;
         float l = 0;
         var e = transform.localScale.x;
-        while (true)
+        var end = (e - f) * 0.5f / (scaleFilter * e);
+        var start = left.localScale.x;
+        while (transform)
         {
-            var a = Mathf.LerpAngle(e, f, l += t * Time.deltaTime);
-            transform.localScale = new Vector3(a, transform.localScale.y, transform.localScale.z);
+            var a = Mathf.LerpAngle(start, end, l += t * Time.deltaTime);
+            var s = left.localScale;
+            s.x = a;
+            left.localScale = s;
+            right.localScale = s;
             yield return new WaitForEndOfFrame();
             if (l > 1)
                 break;
@@ -51,7 +58,11 @@ public class CoverEntity : HassEntity
         if (float.TryParse(state, out f))
         {
             StopAllCoroutines();
-            StartCoroutine(To(f));
+            StartCoroutine(To(f * 0.01f * openW));
         }
+    }
+    public override void ReconstitutionMode(bool enter)
+    {
+
     }
 }

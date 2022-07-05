@@ -387,13 +387,9 @@ public class Reconstitution : MonoBehaviour
         else if (door is CoverEntity)
         {
             var e = door as CoverEntity;
-            PropPanle.Instance.GetV1("Open", e.angleopen, (x) =>
+            PropPanle.Instance.GetV1("Open", e.openW, (x) =>
             {
-                e.angleopen = x;
-            });
-            PropPanle.Instance.GetV1("Close", e.angleclose, (x) =>
-            {
-                e.angleclose = x;
+                e.openW = x;
             });
         }
         PropPanle.Instance.GetEntity("ID", door.Entity_id, (x) =>
