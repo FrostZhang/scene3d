@@ -15,7 +15,6 @@ public class HouseWeather : HassEntity
     public Color32 cL = new Color32(0, 0, 0, 255);
 
     public Volume volume;
-    private string lastWeather;
     string skyname;
     bool ready;
     ParticleSystem rmain;
@@ -82,9 +81,6 @@ public class HouseWeather : HassEntity
     }
     internal void SetWeather(string str)
     {
-        if (lastWeather == str)
-            return;
-        lastWeather = str;
         SetRain(0);
         SetSnow(0);
         SetLighting(0);
