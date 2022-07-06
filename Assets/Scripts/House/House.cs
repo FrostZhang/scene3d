@@ -376,10 +376,10 @@ public class House : MonoBehaviour
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, parent);
         tr.name = cusname;
-        var area = new GameObject().transform;
+        var area = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
         area.transform.SetParent(parent);
         area.position = new Vector3(x, 0, y);
-        area.localScale = new Vector3(w, 0, h);
+        area.localScale = new Vector3(w, 0.1f, h);
         var animal = tr.GetComponent<ZebraEntity>();
         animal.SetArea(area);
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.animal);
@@ -440,6 +440,15 @@ public class House : MonoBehaviour
                 Color c;
                 if (Help.Instance.TryColor(creatData.color, out c))
                     e.emColor = c;
+            }
+            else if (tr is CoverEntity)
+            {
+                float f;
+                if (float.TryParse(creatData.moreinfo, out f))
+                {
+                    var e = tr as CoverEntity;
+                    e.openW = f;
+                }
             }
         }
         return null;
@@ -1280,6 +1289,13 @@ public class House : MonoBehaviour
                 writer.WritePropertyName("color");
                 Color32 ma = e.emColor;
                 writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
+            }
+            else if (tr is CoverEntity)
+            {
+                var e = tr as CoverEntity;
+                writer.WritePropertyName("more");
+                float ma = e.openW;
+                writer.Write(ma);
             }
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();

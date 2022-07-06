@@ -7,14 +7,22 @@ public class CoverEntity : HassEntity
     public float scaleFilter = 1.47f;
     /// <summary>¿ª </summary>
     public float openW;
-    public Transform left, right;
+    [SerializeField] Transform left, right;
+    [SerializeField] GameObject high;
     protected virtual void Start()
     {
         if (openW > transform.localScale.x || openW <= 0)
             openW = transform.localScale.x - 0.1f;
         GetComponent<Collider>().enabled = true;
     }
-
+    public override void MouseOn()
+    {
+        high.SetActive(true);
+    }
+    public override void MouseExit()
+    {
+        high.SetActive(false);
+    }
     protected override void TrunOn()
     {
         StopAllCoroutines();

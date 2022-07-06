@@ -14,6 +14,7 @@ public class ZebraEntity : HassEntity
     public void SetArea(Transform plane)
     {
         area = plane;
+        area.gameObject.SetActive(false);
         transform.position = plane.position;
     }
 
@@ -59,5 +60,11 @@ public class ZebraEntity : HassEntity
             yield return new WaitForEndOfFrame();
         }
         NextAnim();
+    }
+
+    public override void ReconstitutionMode(bool enter)
+    {
+        base.ReconstitutionMode(enter);
+        area.gameObject.SetActive(enter);
     }
 }
