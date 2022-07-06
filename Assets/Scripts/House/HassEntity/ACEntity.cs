@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ACEntity : HassEntity
 {
-    [SerializeField] GameObject eff;
+    [SerializeField] ParticleSystem eff;
     [SerializeField] GameObject high;
     public override void MouseOn()
     {
@@ -16,15 +16,42 @@ public class ACEntity : HassEntity
     }
     void Awake()
     {
-        eff.SetActive(false);
+        eff.gameObject.SetActive(false);
     }
     protected override void TrunOn()
     {
-        eff.SetActive(true);
+        eff.gameObject.SetActive(true);
     }
     protected override void TrunOff()
     {
-        eff.SetActive(false);
+        eff.gameObject.SetActive(false);
+    }
+    protected override void HassDestine(string state)
+    {
+        if (state == "cool")
+        {
+            eff.gameObject.SetActive(true);
+            var m = eff.main;
+            var c = m.startColor;
+            c.color = Color.blue;
+            m.startColor = c;
+        }
+        else if (state == "heat")
+        {
+            eff.gameObject.SetActive(true);
+            var m = eff.main;
+            var c = m.startColor;
+            c.color = Color.red;
+            m.startColor = c;
+        }
+        else  if (state == "heat_cool")
+        {
+            eff.gameObject.SetActive(true);
+            var m = eff.main;
+            var c = m.startColor;
+            c.color = Color.green;
+            m.startColor = c;
+        }
     }
     protected override void HassStateOn()
     {
@@ -39,13 +66,13 @@ public class ACEntity : HassEntity
     {
         if (enter)
         {
-            eff.SetActive(false);
+            eff.gameObject.SetActive(false);
         }
         else
         {
             if (open)
             {
-                eff.SetActive(true);
+                eff.gameObject.SetActive(true);
             }
         }
     }
