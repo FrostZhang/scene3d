@@ -44,7 +44,7 @@ public class ACEntity : HassEntity
             c.color = Color.red;
             m.startColor = c;
         }
-        else  if (state == "heat_cool")
+        else if (state == "heat_cool")
         {
             eff.gameObject.SetActive(true);
             var m = eff.main;
@@ -52,6 +52,11 @@ public class ACEntity : HassEntity
             c.color = Color.green;
             m.startColor = c;
         }
+        else
+        {
+            eff.gameObject.SetActive(false);
+        }
+        RunPanel.instance.Show(transform, "AC " + state + "!");
     }
     protected override void HassStateOn()
     {
