@@ -48,8 +48,44 @@ SpriteAtlas:
     isAtlasV2: 0
     cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites: []
-  m_PackedSpriteNamesToIndex: []
+  m_PackedSprites:
+  - {fileID: 21300000, guid: be8fca00182baf844b61a34f6cfb9948, type: 3}
+  - {fileID: 21300000, guid: 9b9cb9b0407673448939d155a7328627, type: 3}
+  - {fileID: 21300000, guid: c05991e58a45d964bb99768bf0a715f6, type: 3}
+  - {fileID: 21300000, guid: 8cfab62698e4d494c87716f7964efcb1, type: 3}
+  - {fileID: 21300000, guid: 8aa83d969a7b4274fac50a404dd64ed7, type: 3}
+  - {fileID: 21300000, guid: 41793798fed90fe46a4a7f93bcd39932, type: 3}
+  - {fileID: 21300000, guid: 54623b4a0f70faf4b8bbbe5cd439294e, type: 3}
+  - {fileID: 21300000, guid: b659f6faeaad5d142ab681ab54c2c991, type: 3}
+  - {fileID: 21300000, guid: 594a339b47de5fd4e888e4b7d6624b0f, type: 3}
+  - {fileID: 21300000, guid: 5b065ccb955900546aa8a90cd1095550, type: 3}
+  - {fileID: 21300000, guid: 1b2113db1b2c1ba4c8e5036eb372aac4, type: 3}
+  - {fileID: 21300000, guid: 2e7149eb681b58540aacd49fb509c7f7, type: 3}
+  - {fileID: 21300000, guid: a319abcc6e7a41749ad20fba0223db16, type: 3}
+  - {fileID: 21300000, guid: 82a81c8d3b7868b4d80011d405b61136, type: 3}
+  - {fileID: 21300000, guid: 2e16c24eb24429a4a985a79b2e9de923, type: 3}
+  - {fileID: 21300000, guid: 3b76ee8e4ae1c1441bd999f65e40adf0, type: 3}
+  - {fileID: 21300000, guid: 5273248f4f260f54fa5d541a2c683915, type: 3}
+  - {fileID: 21300000, guid: 7152d4df39b3c6c4eb41adbfdd7e23c6, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - kuang
+  - edit-6931553_640
+  - qiang
+  - stand
+  - sky
+  - mao
+  - xuan
+  - line
+  - gonggao
+  - http-1
+  - floor
+  - light
+  - wxskm
+  - appliances
+  - door
+  - camera_lens_PNG5
+  - netresource
+  - setting
   m_RenderDataMap: {}
   m_Tag: editIcon
   m_IsVariant: 0
