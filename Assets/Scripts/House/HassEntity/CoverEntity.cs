@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CoverEntity : HassEntity
 {
-    public float scaleFilter = 1.47f;
+    public float curtainScaleFilter = 1.47f;
     /// <summary>¿ª </summary>
     public float openW;
     [SerializeField] Transform left, right;
@@ -46,7 +46,7 @@ public class CoverEntity : HassEntity
         float t = 1 / 2f;
         float l = 0;
         var e = transform.localScale.x;
-        var end = (e - f) * 0.5f / (scaleFilter * e);
+        var end = (e - f) * 0.5f / (curtainScaleFilter * e);
         var start = left.localScale.x;
         while (transform)
         {
@@ -54,6 +54,7 @@ public class CoverEntity : HassEntity
             var s = left.localScale;
             s.x = a;
             left.localScale = s;
+            s.x = -a;
             right.localScale = s;
             yield return new WaitForEndOfFrame();
             if (l > 1)
