@@ -1,80 +1,26 @@
 fileFormatVersion: 2
-guid: 927722d88e6a0b24589fa85a0768eb69
+guid: 55c69f1dc59054e488423aa7fe451e42
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable:
   - first:
       1: 100000
-    second: Box175
-  - first:
-      1: 100002
-    second: Box176
-  - first:
-      1: 100004
-    second: Prop_Sci_seat_003
-  - first:
-      1: 100006
-    second: Prop_Sci_seat_004
-  - first:
-      1: 100008
     second: //RootNode
   - first:
       4: 400000
-    second: Box175
-  - first:
-      4: 400002
-    second: Box176
-  - first:
-      4: 400004
-    second: Prop_Sci_seat_003
-  - first:
-      4: 400006
-    second: Prop_Sci_seat_004
-  - first:
-      4: 400008
     second: //RootNode
   - first:
       23: 2300000
-    second: Box175
-  - first:
-      23: 2300002
-    second: Box176
-  - first:
-      23: 2300004
-    second: Prop_Sci_seat_003
-  - first:
-      23: 2300006
-    second: Prop_Sci_seat_004
+    second: //RootNode
   - first:
       33: 3300000
-    second: Box175
-  - first:
-      33: 3300002
-    second: Box176
-  - first:
-      33: 3300004
-    second: Prop_Sci_seat_003
-  - first:
-      33: 3300006
-    second: Prop_Sci_seat_004
+    second: //RootNode
   - first:
       43: 4300000
-    second: Box175
-  - first:
-      43: 4300002
-    second: Prop_Sci_seat_003
-  - first:
-      43: 4300004
-    second: Prop_Sci_seat_004
-  - first:
-      43: 4300006
-    second: Box176
-  - first:
-      95: 9500000
-    second: //RootNode
+    second: B&B_MAXALTO_3_329
   externalObjects: {}
   materials:
-    materialImportMode: 1
+    materialImportMode: 0
     materialName: 0
     materialSearch: 1
     materialLocation: 0
@@ -100,11 +46,11 @@ ModelImporter:
     extraExposedTransformPaths: []
     extraUserProperties: []
     clipAnimations: []
-    isReadable: 1
+    isReadable: 0
   meshes:
     lODScreenPercentages: []
     globalScale: 1
-    meshCompression: 2
+    meshCompression: 1
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 0
@@ -114,10 +60,10 @@ ModelImporter:
     importLights: 0
     fileIdsGeneration: 1
     swapUVChannels: 0
-    generateSecondaryUV: 1
+    generateSecondaryUV: 0
     useFileUnits: 1
     keepQuads: 0
-    weldVertices: 1
+    weldVertices: 0
     bakeAxisConversion: 0
     preserveHierarchy: 0
     skinWeightsMode: 0
@@ -126,8 +72,8 @@ ModelImporter:
     meshOptimizationFlags: -1
     indexFormat: 1
     secondaryUVAngleDistortion: 8
-    secondaryUVAreaDistortion: 15
-    secondaryUVHardAngle: 30
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
     secondaryUVMarginMethod: 0
     secondaryUVMinLightmapResolution: 40
     secondaryUVMinObjectScale: 1
@@ -142,7 +88,7 @@ ModelImporter:
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
   referencedClips: []
-  importAnimation: 1
+  importAnimation: 0
   humanDescription:
     serializedVersion: 3
     human: []
@@ -161,9 +107,9 @@ ModelImporter:
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
-  avatarSetup: 1
+  avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 0
   additionalBone: 0
   userData: 
