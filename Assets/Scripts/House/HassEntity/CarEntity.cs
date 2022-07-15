@@ -12,11 +12,13 @@ public class CarEntity : HassEntity
     }
     protected override void TrunOn()
     {
+        transform.gameObject.SetActive(true);
         StopAllCoroutines();
         StartCoroutine(Anim(true));
     }
     protected override void TrunOff()
     {
+        transform.gameObject.SetActive(true);
         StopAllCoroutines();
         StartCoroutine(Anim(false));
     }
@@ -63,7 +65,6 @@ public class CarEntity : HassEntity
         {
             endpos = transform.forward * 3 + transform.position;
         }
-        transform.gameObject.SetActive(true);
         float f = 0;
         while (transform && (f += Time.deltaTime) < 1)
         {
