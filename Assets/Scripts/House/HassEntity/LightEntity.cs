@@ -2,6 +2,7 @@ using LitJson;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class LightEntity : HassEntity
 {
@@ -21,7 +22,14 @@ public class LightEntity : HassEntity
         clight.range = max;
         clight.intensity = 0;
     }
-
+    public async override void Click()
+    {
+        var res = await UIMenu.instance.Show(Input.mousePosition, "Open/Close");
+        if (res == 0)
+        {
+            base.Click();
+        }
+    }
     public override void MouseExit()
     {
         _renderer.enabled = false;

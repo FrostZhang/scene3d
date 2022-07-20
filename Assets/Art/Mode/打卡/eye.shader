@@ -57,7 +57,7 @@ Shader "Unlit/look"
                 // sample the texture
                 //fixed4 col = i.color *  (1+_EmissionColor);
                 fixed4 col = tex2D(_MainTex, i.uv) * _Color * ( 1+_EmissionColor);
-                col.rgb *= clamp((frac(_Time.y)+1)*_Speed,0.5,1);
+                col.rgb *= clamp((frac(_Time.y)+1)*_Speed,0.1,1);
                 //UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;
             }

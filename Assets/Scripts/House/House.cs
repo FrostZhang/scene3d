@@ -87,6 +87,10 @@ public class House : MonoBehaviour
     {
         var t = Resources.Load<Transform>("UI/RunPanel");
         Instantiate(t, canvas);
+        var um = Resources.Load<UnityEngine.UI.UIMenu>("UI/UIMenu");
+        um = Instantiate(um, canvas);
+        um.transform.SetAsFirstSibling();
+        um.gameObject.SetActive(false);
         Shijie.OnGetConfig += OnGetConfig;
         Shijie.OnHassFlush += OnHassFlush;
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -886,7 +890,8 @@ public class House : MonoBehaviour
                 entity = null;
             }
         }
-        if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.third)
+        if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.third 
+            && !UnityEngine.UI.UIMenu.instance.isActiveAndEnabled)
         {
             CameraControllerForUnity.Instance.xAngle += Time.deltaTime * CacheData.RoSpeed;
             if (CameraControllerForUnity.Instance.xAngle > 360)
