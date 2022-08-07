@@ -78,7 +78,9 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "Donate\n\u4E09\u7EF4\u5F00\u53D1\u662F\u4E00\u4EF6\u8D39\u65F6\u8D39\u529B\u7684\u5DE5\u4F5C\n\u6350\u8D60\u4E3A\u4F5C\u8005\u52A0\u6CB9\u6253\u6C14"
+  m_Text: 'Donate
+
+'
 --- !u!1 &4606951205980838779
 GameObject:
   m_ObjectHideFlags: 0
@@ -493,7 +495,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: -2.25, y: -210}
-  m_SizeDelta: {x: 215.5, y: 64.5}
+  m_SizeDelta: {x: 215.5, y: 32.728}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &4606951207322223000
 CanvasRenderer:

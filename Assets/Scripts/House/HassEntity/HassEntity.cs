@@ -43,7 +43,7 @@ public class HassEntity : MonoBehaviour
     }
 
     /// <summary> Click From mouse or touch </summary>
-    public void Click()
+    public virtual void Click()
     {
         if (string.IsNullOrEmpty(entity_id))
         {
