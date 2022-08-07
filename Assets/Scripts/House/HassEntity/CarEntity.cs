@@ -9,6 +9,14 @@ public class CarEntity : HassEntity
     {
         GetComponent<BoxCollider>().enabled = false;
         iniPos = transform.position;
+        if (open)
+        {
+            TrunOn();
+        }
+        else
+        {
+            TrunOff();
+        }
     }
     protected override void TrunOn()
     {

@@ -6,7 +6,7 @@ var WebGLInput = {
 		if(typeof Runtime === "undefined") Runtime = { dynCall : dynCall }
 	},
     WebGLInputCreate: function (canvasId, x, y, width, height, fontsize, text, placeholder, isMultiLine, isPassword, isHidden, isMobile) {
-        var container = window.showR.shadowRoot.getElementById("unity-container");
+        var container = window.asherlink3dscencecard.shadowRoot.getElementById("unity-container");
         var canvas = container.getElementsByTagName('canvas')[0];
         // if container is null and have canvas
         if (!container && canvas)

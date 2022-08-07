@@ -106,12 +106,14 @@ public class HouseWeather : HassEntity
             case "疾风":
             case "大风":
             case "烈风":
+            case "windy-variant":
                 break;
             case "飓风":
             case "龙卷风":
             case "热带风暴":
             case "狂暴风":
             case "风暴":
+            case "exceptional":
                 break;
             case "小雨":
             case "雨":
@@ -123,6 +125,7 @@ public class HouseWeather : HassEntity
                 SetRain(300);
                 break;
             case "大雨":
+            case "hail":
                 SetRain(400);
                 break;
             case "阵雨":
@@ -131,6 +134,7 @@ public class HouseWeather : HassEntity
             case "暴雨":
             case "大暴雨":
             case "storm":
+            case "pouring":
                 SetRain(700);
                 break;
             case "特大暴雨":
@@ -166,6 +170,7 @@ public class HouseWeather : HassEntity
                 SetRain(200);
                 break;
             case "雨雪天气":
+            case "snowy-rainy":
                 SetSnow(400);
                 SetRain(300);
                 break;
@@ -174,6 +179,7 @@ public class HouseWeather : HassEntity
                 SetRain(500);
                 break;
             case "雾":
+            case "fog":
                 SetFog(40);  //80
                 ChangeFogColor(Color.white);
                 break;
