@@ -14,7 +14,7 @@ public class ZebraEntity : HassEntity
     public void SetArea(Transform plane)
     {
         area = plane;
-        area.gameObject.SetActive(false);
+        area.gameObject.SetActive(Reconstitution.Instance.IsEdit);
         transform.position = plane.position;
     }
 
@@ -23,9 +23,21 @@ public class ZebraEntity : HassEntity
         NextAnim();
     }
 
+    void CheckArea()
+    {
+        if (!area)
+        {
+            if (transform)
+            {
+                Destroy(gameObject);
+            }
+        }
+    }
+
     private void NextAnim()
     {
         if (!transform) return;
+        CheckArea();
         if (Random.value > 0.4f)
         {
             Vector3 pos = area.TransformPoint(new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f));

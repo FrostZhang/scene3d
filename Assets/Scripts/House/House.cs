@@ -87,10 +87,10 @@ public class House : MonoBehaviour
     {
         var t = Resources.Load<Transform>("UI/RunPanel");
         Instantiate(t, canvas);
-        var um = Resources.Load<UnityEngine.UI.UIMenu>("UI/UIMenu");
-        um = Instantiate(um, canvas);
-        um.transform.SetAsFirstSibling();
-        um.gameObject.SetActive(false);
+        //var um = Resources.Load<UnityEngine.UI.UIMenu>("UI/UIMenu");
+        //um = Instantiate(um, canvas);
+        //um.transform.SetAsFirstSibling();
+        //um.gameObject.SetActive(false);
         Shijie.OnGetConfig += OnGetConfig;
         Shijie.OnHassFlush += OnHassFlush;
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -103,6 +103,7 @@ public class House : MonoBehaviour
 #else
     ReadCustomConfig();
 #endif
+
     }
 
     private async void ReadCustomConfig()
@@ -381,13 +382,14 @@ public class House : MonoBehaviour
         tr = Instantiate(tr, parent);
         tr.name = cusname;
         var area = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
+        area.name = cusname + "_area";
         area.transform.SetParent(parent);
         area.position = new Vector3(x, 0, y);
         area.localScale = new Vector3(w, 0.1f, h);
         var animal = tr.GetComponent<ZebraEntity>();
         animal.SetArea(area);
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.animal);
-        cureetHouse.Add(tr.transform, data);
+        cureetHouse.Add(area, data);
         return animal;
     }
 
@@ -890,8 +892,8 @@ public class House : MonoBehaviour
                 entity = null;
             }
         }
-        if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.third 
-            && !UnityEngine.UI.UIMenu.instance.isActiveAndEnabled)
+        if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.third
+           /* && !UnityEngine.UI.UIMenu.instance.isActiveAndEnabled*/)
         {
             CameraControllerForUnity.Instance.xAngle += Time.deltaTime * CacheData.RoSpeed;
             if (CameraControllerForUnity.Instance.xAngle > 360)

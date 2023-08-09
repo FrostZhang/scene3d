@@ -8,9 +8,9 @@ mergeInto(LibraryManager.library,
   },
    WebglAsherLink3DClickMessage: function(str)
   {
-    if(typeof AsherLink3DClickMessage != "undefined" && AsherLink3DClickMessage instanceof Function){
-        AsherLink3DClickMessage(Pointer_stringify(str));
-    }
+	if(asherlink3dscencehass  != "undefined")
+		var obj = JSON.parse(str);
+		asherlink3dscencehass.callService(obj["head"],obj["cmd"],{"entity_id": obj["entity_id"]});
   },
    WebglAsherLink3DLongClickMessage: function(str)
   {
@@ -31,6 +31,12 @@ mergeInto(LibraryManager.library,
   WebglAsherLink3DWebLog: function(str)
  {
     console.log(Pointer_stringify(str))
+ },
+ WebglBigView: function(style)
+ {
+    if(typeof AsherLink3DConfig != "undefined" && AsherLink3DBigView instanceof Function){
+        AsherLink3DBigView(style);
+	}
  },
  WebglHelloFloat: function()
   {

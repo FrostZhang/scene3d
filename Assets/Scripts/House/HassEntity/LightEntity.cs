@@ -24,8 +24,8 @@ public class LightEntity : HassEntity
     }
     public async override void Click()
     {
-        var res = await UIMenu.instance.Show(Input.mousePosition, "Open/Close");
-        if (res == 0)
+        //var res = await UIMenu.instance.Show(Input.mousePosition, "Open/Close");
+        //if (res == 0)
         {
             base.Click();
         }

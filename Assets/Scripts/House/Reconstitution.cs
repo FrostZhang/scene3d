@@ -229,8 +229,9 @@ public class Reconstitution : MonoBehaviour
                     break;
                 //case HouseEntityType.flowLine:
                 //    break;
-                //case HouseEntityType.animal:
-                //    break;
+                case HouseEntityType.animal:
+                    ShowAnimal(target);
+                    break;
                 //case HouseEntityType.weather:
                 //    break;
                 case HouseEntityType.eye:
@@ -243,6 +244,39 @@ public class Reconstitution : MonoBehaviour
         }
     }
 
+    private void ShowAnimal(Transform target)
+    {
+        PropPanle.Instance.Clear();
+        PropPanle.Instance.GetV2("Pos", target.position.x, target.position.z,
+            (x) =>
+            {
+                var pc = target.position;
+                pc.x = x;
+                target.position = pc;
+                FlushGizmo(pc);
+            }, (x) =>
+            {
+                var pc = target.position;
+                pc.z = x;
+                target.position = pc;
+                FlushGizmo(pc);
+            });
+        PropPanle.Instance.GetV2("Scale", target.localScale.x, target.localScale.z,
+        (x) =>
+        {
+            var pc = target.localScale;
+            if (x == 0) x = 0.1f;
+            pc.x = x;
+            target.localScale = pc;
+        }, (x) =>
+        {
+            var pc = target.localScale;
+            if (x == 0) x = 0.1f;
+            pc.z = x;
+            target.localScale = pc;
+        });
+        PropPanle.Instance.Show(true);
+    }
 
     private void FlushPropPanle()
     {

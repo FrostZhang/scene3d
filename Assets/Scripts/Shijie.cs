@@ -59,7 +59,8 @@ public class Shijie : MonoBehaviour
     static extern void WebglAsherLink3DConfig(string mes);
     [System.Runtime.InteropServices.DllImport("__Internal")]
     private static extern float WebglHelloFloat();
-
+    [System.Runtime.InteropServices.DllImport("__Internal")]
+    private static extern void WebglBigView(int style);
     public static void Link3DStart()
     {
 #if UNITY_EDITOR
@@ -113,6 +114,15 @@ public class Shijie : MonoBehaviour
         return 0;
 #else
         return  WebglHelloFloat();
+#endif
+    }
+
+    public static void Link3DBigView(int bigstyle)
+    {
+#if UNITY_EDITOR
+        return;
+#else
+        WebglBigView(bigstyle);
 #endif
     }
 }

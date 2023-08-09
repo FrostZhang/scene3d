@@ -10,7 +10,7 @@ public class HousePanel : MonoBehaviour
     public Slider tianguang, rain, snow, fog, lighting, ranyuanjin;
     public Button changeCamera, edit;
     public Toggle roOrMove;
-    public Button resetCamera;
+    public Button resetCamera,big;
     public Button info, zanzu;
     void Awake()
     {
@@ -111,6 +111,7 @@ public class HousePanel : MonoBehaviour
             var t = Resources.Load<Transform>("UI/DashangPanel");
             Instantiate(t, House.Instance.canvas);
         });
+        big.onClick.AddListener(SetBig);
         if (Shijie.WhichStand() == 1)
         {
             HouseWeather.Instance.mainlight.shadows = LightShadows.None;
@@ -118,6 +119,20 @@ public class HousePanel : MonoBehaviour
         }
         else
             edit.onClick.AddListener(Edit);
+    }
+
+    int bigstyle = 0;
+    private void SetBig()
+    {
+        if (bigstyle ==0)
+        {
+            bigstyle = 1;
+        }
+        else
+        {
+            bigstyle = 0;
+        }
+        Shijie.Link3DBigView(bigstyle);
     }
 
     private void Edit()
