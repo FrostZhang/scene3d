@@ -23,21 +23,26 @@ public class ZebraEntity : HassEntity
         NextAnim();
     }
 
-    void CheckArea()
+    bool CheckArea()
     {
         if (!area)
         {
             if (transform)
             {
                 Destroy(gameObject);
+                return false;
             }
         }
+        return true;
     }
 
     private void NextAnim()
     {
         if (!transform) return;
-        CheckArea();
+        if (!CheckArea())
+        {
+            return;
+        }
         if (Random.value > 0.4f)
         {
             Vector3 pos = area.TransformPoint(new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f));
