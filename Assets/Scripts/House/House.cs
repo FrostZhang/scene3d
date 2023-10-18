@@ -18,11 +18,6 @@ public class HouseEntityData
     public string supplier;
     public string url;
 
-    public HouseEntityData(HouseEntityType entityType)
-    {
-        this.entityType = entityType;
-    }
-
     public HouseEntityData(string url)
     {
         this.url = url;
@@ -389,7 +384,7 @@ public class House : MonoBehaviour
         var animal = tr.GetComponent<ZebraEntity>();
         animal.SetArea(area);
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.animal);
-        cureetHouse.Add(area, data);
+        cureetHouse.Add(animal.transform, data);
         return animal;
     }
 
@@ -633,7 +628,7 @@ public class House : MonoBehaviour
             lineE.SetOnc(c);
         if (Help.Instance.TryColor(coff, out c))
             lineE.SetOffc(c);
-        HouseEntityData data = new HouseEntityData(HouseEntityType.flowLine);
+        HouseEntityData data = new HouseEntityData("flowline", HouseEntityType.flowLine);
         cureetHouse.Add(lineE.transform, data);
         var ma = lineE.line.material;
         ma = new Material(ma);
@@ -748,7 +743,7 @@ public class House : MonoBehaviour
                 le.SetEntity(id);
                 lis.Add(le);
             }
-            HouseEntityData data = new HouseEntityData(HouseEntityType.arealight);
+            HouseEntityData data = new HouseEntityData("arealight", HouseEntityType.arealight);
             cureetHouse.Add(tr.transform, data);
             le.clight.intensity = li;
             Color c;
@@ -1194,6 +1189,8 @@ public class House : MonoBehaviour
         writer.WriteArrayStart();
         foreach (var g in group)
         {
+            if (string.IsNullOrEmpty(g.Value.shortname))
+                continue;
             writer.WriteObjectStart();
             writer.WritePropertyName(g.Value.shortname);
             writer.WriteObjectStart();
@@ -1220,7 +1217,10 @@ public class House : MonoBehaviour
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.Value.shortname);
+            if (!string.IsNullOrEmpty(item.Value.shortname))
+                writer.WritePropertyName(item.Value.shortname);
+            else
+                writer.WritePropertyName("flowLine");
             writer.WriteObjectStart();
             var tr = item.Key;
             var line = tr.GetComponent<LineEntity>();
@@ -1255,6 +1255,8 @@ public class House : MonoBehaviour
         writer.WriteArrayStart();
         foreach (var item in group)
         {
+            if (string.IsNullOrEmpty(item.Value.shortname))
+                continue;
             writer.WriteObjectStart();
             writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
@@ -1317,7 +1319,10 @@ public class House : MonoBehaviour
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.Value.shortname);
+            if (!string.IsNullOrEmpty(item.Value.shortname))
+                writer.WritePropertyName(item.Value.shortname);
+            else
+                writer.WritePropertyName("arealight");
             writer.WriteObjectStart();
             var tr = item.Key;
             var lit = tr.GetComponent<LightEntity>();
@@ -1340,6 +1345,8 @@ public class House : MonoBehaviour
         writer.WriteArrayStart();
         foreach (var item in group)
         {
+            if (string.IsNullOrEmpty(item.Value.shortname))
+                continue;
             writer.WriteObjectStart();
             writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
@@ -1366,6 +1373,8 @@ public class House : MonoBehaviour
         writer.WriteArrayStart();
         foreach (var item in group)
         {
+            if (string.IsNullOrEmpty(item.Value.shortname))
+                continue;
             writer.WriteObjectStart();
             writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
@@ -1390,6 +1399,8 @@ public class House : MonoBehaviour
         writer.WriteArrayStart();
         foreach (var item in group)
         {
+            if (string.IsNullOrEmpty(item.Value.shortname))
+                continue;
             writer.WriteObjectStart();
             writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
@@ -1420,7 +1431,10 @@ public class House : MonoBehaviour
         foreach (var item in group)
         {
             writer.WriteObjectStart();
-            writer.WritePropertyName(item.Value.shortname);
+            if (string.IsNullOrEmpty(item.Value.shortname))
+                writer.WritePropertyName("look");
+            else
+                writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
             writer.WritePropertyName("pos");
             var tr = item.Key;
@@ -1449,6 +1463,8 @@ public class House : MonoBehaviour
         writer.WriteArrayStart();
         foreach (var item in group)
         {
+            if (string.IsNullOrEmpty(item.Value.shortname))
+                continue;
             writer.WriteObjectStart();
             writer.WritePropertyName(item.Value.shortname);
             writer.WriteObjectStart();
