@@ -17,6 +17,7 @@ public class PropPanle : MonoBehaviour
     public ScrollRect scroll;
     public Button delete;
     public PSColorPanel pSColor;
+    public Button exitcolorp;
     List<Transform> trs;
     List<InputField> fs;
     public Action Ondel;
@@ -37,6 +38,16 @@ public class PropPanle : MonoBehaviour
         {
             Ondel?.Invoke();
         });
+        exitcolorp.onClick.AddListener(() =>
+        {
+            CloseColorPanel();
+        });
+    }
+
+    private void CloseColorPanel()
+    {
+        pSColor.transform.parent.gameObject.SetActive(false);
+        pSColor.OnColorChanged = null;
     }
 
     void OnDestroy()
@@ -109,7 +120,7 @@ public class PropPanle : MonoBehaviour
         var idt = ff.GetComponentInChildren<Text>();
         ff.onClick.AddListener(() =>
         {
-            CreatPanel.Instance.entityListPanel.Show(true, (n) =>
+            Surface.surface.LoadPanel<EntityListPanel>().ChooseEntity((n) =>
             {
                 idt.text = n;
                 act?.Invoke(n);
@@ -219,8 +230,7 @@ public class PropPanle : MonoBehaviour
         {
             if (pSColor.OnColorChanged != null)
             {
-                pSColor.transform.parent.gameObject.SetActive(false);
-                pSColor.OnColorChanged = null;
+                CloseColorPanel();
                 return;
             }
             pSColor.transform.parent.gameObject.SetActive(true);
@@ -243,18 +253,16 @@ public class PropPanle : MonoBehaviour
         }
         trs.Clear();
         fs.Clear();
-        pSColor.transform.parent.gameObject.SetActive(false);
-        pSColor.OnColorChanged = null;
-        CreatPanel.Instance.entityListPanel.Show(false, null);
+        CloseColorPanel();
+        Surface.surface.RemovePanel<EntityListPanel>();
         return this;
     }
 
     public void Show(bool b)
     {
         gameObject.SetActive(b);
-        pSColor.transform.parent.gameObject.SetActive(false);
-        pSColor.OnColorChanged = null;
-        CreatPanel.Instance.entityListPanel.Show(false, null);
+        CloseColorPanel();
+        Surface.surface.RemovePanel<EntityListPanel>();
     }
 
     public void Flush(int[] index, params float[] values)

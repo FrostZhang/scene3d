@@ -4,75 +4,64 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HousePanel : MonoBehaviour
+public class HousePanel : MonoBehaviour, IPanel
 {
     public static HousePanel Instance;
-    public Slider tianguang, rain, snow, fog, lighting, ranyuanjin;
-    public Button changeCamera, edit;
-    public Toggle roOrMove;
-    public Button resetCamera,big;
-    public Button info, zanzu;
+    public StatesBtn changeCamera, roOrMove;
+    public Button resetCamera, setting;
+
+    public Transform Tr { get; set; }
+
     void Awake()
     {
         Instance = this;
     }
-    void Start()
+    public void Start()
     {
-        tianguang.onValueChanged.AddListener(HouseWeather.Instance.SetTianGuang);
-        rain.onValueChanged.AddListener(HouseWeather.Instance.SetRain);
-        snow.onValueChanged.AddListener(HouseWeather.Instance.SetSnow);
-        fog.onValueChanged.AddListener(HouseWeather.Instance.SetFog);
-        lighting.onValueChanged.AddListener(HouseWeather.Instance.SetLighting);
-        ranyuanjin.onValueChanged.AddListener((x) =>
-        {
-            CameraControllerForUnity.Instance.targetdis = x;
-            CameraControllerForUnity.Instance.targetorthographicSize = x;
-        });
-        changeCamera.onClick.AddListener(() =>
-        {
-            if (Reconstitution.Instance.IsEdit || CameraControllerForUnity.Instance.enabled == false)
-                return;
-            if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.third)
-            {
-                CameraControllerForUnity.Instance.transform.position = new Vector3(0, -1, 0);
-                CameraControllerForUnity.Instance.MobaFollow_orthogonal(CameraControllerForUnity.Instance.transform, new Vector2(90, 0), 15, 5);
-            }
-            else if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.moba)
-            {
-                List<Eye> eyes = new List<Eye>();
-                foreach (var item in House.Instance.CureetHouse)
-                {
-                    if (item.Value.entityType == HouseEntityType.eye)
-                    {
-                        var e = item.Key.GetComponent<Eye>();
-                        e.Show(true);
-                        eyes.Add(e);
-                    }
-                }
-                if (eyes.Count > 0)
-                {
-                    roOrMove.isOn = true;   //第一人称 不允许平移
-                    eyes.Sort((x, y) => x.priority - y.priority);
-                    eyes[0].OnMouseUpAsButton();
-                }
-                else
-                {
-                    CameraControllerForUnity.Instance.Thirdfocus(new Vector3(0, -1, 0), new Vector2(45, 0), 12);
-                }
-            }
-            else if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.first)
-            {
-                foreach (var item in House.Instance.CureetHouse)
-                {
-                    if (item.Value.entityType == HouseEntityType.eye)
-                    {
-                        var e = item.Key.GetComponent<Eye>();
-                        e.Show(false);
-                    }
-                }
-                CameraControllerForUnity.Instance.Thirdfocus(new Vector3(0, -1, 0), new Vector2(45, 0), 12);
-            }
-        });
+        changeCamera.onValueChanged = (x) =>
+          {
+              if (x == 0)
+              {
+                  foreach (var item in House.Instance.CureetHouse)
+                  {
+                      if (item.Value.entityType == HouseEntityType.eye)
+                      {
+                          var e = item.Key.GetComponent<Eye>();
+                          e.Show(false);
+                      }
+                  }
+                  CameraControllerForUnity.Instance.Thirdfocus(new Vector3(0, -1, 0), new Vector2(45, 0), 12);
+              }
+              if (x == 1)
+              {
+                  CameraControllerForUnity.Instance.transform.position = new Vector3(0, -1, 0);
+                  CameraControllerForUnity.Instance.MobaFollow_orthogonal(CameraControllerForUnity.Instance.transform, new Vector2(90, 0), 15, 5);
+              }
+              else if (x == 2)
+              {
+                  List<Eye> eyes = new List<Eye>();
+                  foreach (var item in House.Instance.CureetHouse)
+                  {
+                      if (item.Value.entityType == HouseEntityType.eye)
+                      {
+                          var e = item.Key.GetComponent<Eye>();
+                          e.Show(true);
+                          eyes.Add(e);
+                      }
+                  }
+                  if (eyes.Count > 0)
+                  {
+                      roOrMove.SetValue(0);   //第一人称 不允许平移
+                      eyes.Sort((x, y) => x.priority - y.priority);
+                      eyes[0].OnMouseUpAsButton();
+                  }
+                  else
+                  {
+                      changeCamera.SetValue(0);
+                  }
+              }
+          };
+
         resetCamera.onClick.AddListener(() =>
         {
             if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.third)
@@ -90,53 +79,22 @@ public class HousePanel : MonoBehaviour
 
             }
         });
-        roOrMove.onValueChanged.AddListener((x) =>
-        {
-            if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.first)
+        roOrMove.onValueChanged = (x) =>
             {
-                roOrMove.SetIsOnWithoutNotify(true);
-                return;
-            }
-            CameraControllerForUnity.Instance.roOrMove = x;
-        });
-        CameraControllerForUnity.Instance.roOrMove = roOrMove.isOn;
+                if (CameraControllerForUnity.Instance.mode == CameraControllerForUnity.Mode.first)
+                {
+                    roOrMove.SetIsOnWithoutNotify(0);
+                    return;
+                }
+                CameraControllerForUnity.Instance.roOrMove = x == 0;
+            };
+        CameraControllerForUnity.Instance.roOrMove = roOrMove.State == 0;
 
-        info.onClick.AddListener(() =>
-        {
-            var t = Resources.Load<Transform>("UI/SouquanPanel");
-            Instantiate(t, House.Instance.canvas);
-        });
-        zanzu.onClick.AddListener(() =>
-        {
-            var t = Resources.Load<Transform>("UI/DashangPanel");
-            Instantiate(t, House.Instance.canvas);
-        });
-        big.onClick.AddListener(SetBig);
-        if (Shijie.WhichStand() == 1)
-        {
-            HouseWeather.Instance.mainlight.shadows = LightShadows.None;
-            edit.interactable = false;
-        }
-        else
-            edit.onClick.AddListener(Edit);
+        setting.onClick.AddListener(() => Surface.surface.LoadPanel<SettingPanel>());
     }
 
-    int bigstyle = 0;
-    private void SetBig()
+    public void OnDestroy()
     {
-        if (bigstyle ==0)
-        {
-            bigstyle = 1;
-        }
-        else
-        {
-            bigstyle = 0;
-        }
-        Shijie.Link3DBigView(bigstyle);
-    }
 
-    private void Edit()
-    {
-        Reconstitution.Instance.InEditToggle();
     }
 }

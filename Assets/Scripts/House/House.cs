@@ -1,5 +1,4 @@
 using LitJson;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +56,7 @@ public class CreatData
 public class House : MonoBehaviour
 {
     public static House Instance;
-    public Transform parent { get; set; }
+    public Transform entities { get; set; }
     public Dictionary<Transform, HouseEntityData> CureetHouse { get => cureetHouse; }
     public List<string> HomeassistantEntities { get => homeassistantEntities; }
 
@@ -69,7 +68,7 @@ public class House : MonoBehaviour
     void Awake()
     {
         Instance = this;
-        parent = new GameObject().transform;
+        entities = new GameObject().transform;
         mainCa = Camera.main;
         QualitySettings.SetQualityLevel(2);
         lis = new List<HassEntity>(100);
@@ -80,6 +79,8 @@ public class House : MonoBehaviour
 
     void Start()
     {
+        Surface.surface.LoadPanel<HousePanel>();
+
         var t = Resources.Load<Transform>("UI/RunPanel");
         Instantiate(t, canvas);
         //var um = Resources.Load<UnityEngine.UI.UIMenu>("UI/UIMenu");
@@ -192,11 +193,11 @@ public class House : MonoBehaviour
         var jd = JsonMapper.ToObject(config);
         if (jd == null)
             return;
-        Destroy(parent.gameObject);
+        Destroy(entities.gameObject);
         lis.Clear();
         cureetHouse.Clear();
         lis.Add(HouseWeather.Instance);//×¢²áÌìÆø
-        parent = new GameObject().transform;
+        entities = new GameObject().transform;
         if (jd.IsObject)
         {
             var dic = jd as IDictionary;
@@ -352,7 +353,7 @@ public class House : MonoBehaviour
         //CreatFlowLine("-3.035549,2.620526,0.1,0.1451162,2.608722,0.1,0.1221144,2.625938,1.1,1.986478,2.625938,1.1,2.006577,1.321079,1.1,1.997306,1.308576,0.9",
         //    -1, "255,0,252,255", "red", "");
         CreatStand("electricball", "-3.986,3.766,1.085,0,0,0,0.4,0.4,0.4", null);
-        HouseWeather.Instance.CreatSky("space");
+        HouseWeather.Instance.LoadSky("space");
         CreatData data = new CreatData("tv", "-1.56,-1.565,0.41,0,-90,0,0.7,0.7,0.7");
         CreatAppliances(data);
         data = new CreatData("washer", "-1.68,-4.166,0,0,-90,0,1,1,1");
@@ -374,14 +375,14 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("animal", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        tr = Instantiate(tr, parent);
+        tr = Instantiate(tr, entities);
         tr.name = cusname;
         var area = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
         area.name = cusname + "_area";
-        area.transform.SetParent(parent);
+        area.transform.SetParent(entities);
         area.position = new Vector3(x, 0, y);
         area.localScale = new Vector3(w, 0.1f, h);
-        var animal = tr.GetComponent<ZebraEntity>();
+        var animal = tr.GetComponent<AnimalEntity>();
         animal.SetArea(area);
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.animal);
         cureetHouse.Add(animal.transform, data);
@@ -472,7 +473,7 @@ public class House : MonoBehaviour
         }
         if (!tr)
             return null;
-        tr = Instantiate(tr, parent);
+        tr = Instantiate(tr, entities);
         tr.name = cusname;
         var e = tr.GetComponent<HassEntity>();
         if (e)
@@ -523,7 +524,7 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("stand", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        tr = Instantiate(tr, parent);
+        tr = Instantiate(tr, entities);
         tr.name = cusname;
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.stand);
         cureetHouse.Add(tr.transform, data);
@@ -551,7 +552,7 @@ public class House : MonoBehaviour
             var tr = bs[0] as GameObject;
             if (tr)
             {
-                tr = Instantiate(tr, parent);
+                tr = Instantiate(tr, entities);
                 //tr.name = cusname;
                 HouseEntityData data = new HouseEntityData(url);
                 cureetHouse.Add(tr.transform, data);
@@ -599,7 +600,7 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("look", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        tr = Instantiate(tr, parent);
+        tr = Instantiate(tr, entities);
         tr.name = cusname;
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.eye);
         cureetHouse.Add(tr.transform, data);
@@ -613,7 +614,7 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("line", "flowline");
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>("flowline");
-        var lineE = Instantiate(tr, parent).GetComponent<LineEntity>();
+        var lineE = Instantiate(tr, entities).GetComponent<LineEntity>();
         lineE.name = "line";
 
         lineE.line.positionCount = vs.Length;
@@ -681,7 +682,7 @@ public class House : MonoBehaviour
             var ab = await Help.Instance.LoadAsherlinkdataInSAssets("door", cusname);
             if (ab == null) return null;
             var tr = ab.LoadAsset<GameObject>(cusname);
-            tr = Instantiate(tr, parent);
+            tr = Instantiate(tr, entities);
             tr.name = cusname;
             var p = new Vector3(x, z, y);
             tr.transform.position = p;
@@ -732,7 +733,7 @@ public class House : MonoBehaviour
             //var ab = Help.Instance.GetBundle("light", "arealight");
             //var tr = ab.LoadAsset<GameObject>("arealight");
             var prefab = transform.Find("arealight");
-            var tr = Instantiate(prefab, parent);
+            var tr = Instantiate(prefab, entities);
             tr.name = "light";
             tr.transform.position = new Vector3(x, 0.01f, y);
             tr.transform.localScale = new Vector3(w, 0.1f, h);
@@ -773,7 +774,7 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("floor", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        tr = Instantiate(tr, parent);
+        tr = Instantiate(tr, entities);
         tr.name = cusname;
         tr.transform.position = new Vector3(x, priority * 0.01f, y);
         tr.transform.localScale = new Vector3(w, 1, h);
@@ -810,9 +811,9 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("wall", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        var cube = Instantiate(tr, parent);
+        var cube = Instantiate(tr, entities);
         cube.name = tr.name;
-        cube.transform.SetParent(parent);
+        cube.transform.SetParent(entities);
         cube.transform.localPosition = new Vector3(x, z, y);
         cube.transform.localScale = new Vector3(w, h, t);
         cube.transform.localEulerAngles = new Vector3(0, a, 0);
@@ -1003,7 +1004,7 @@ public class House : MonoBehaviour
     private void AnsSky(JsonData jd)
     {
         var sky = jd["sky"]?.ToString();
-        HouseWeather.Instance.CreatSky(sky);
+        HouseWeather.Instance.LoadSky(sky);
     }
 
     private void AnsStand(JsonData jd)
@@ -1195,7 +1196,7 @@ public class House : MonoBehaviour
             writer.WritePropertyName(g.Value.shortname);
             writer.WriteObjectStart();
             var tr = g.Key;
-            var anim = tr.GetComponent<ZebraEntity>();
+            var anim = tr.GetComponent<AnimalEntity>();
             writer.WritePropertyName("pos");
             var item = anim.Area;
             writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.localScale.x:f2},{item.localScale.z:f2}");

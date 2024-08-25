@@ -73,27 +73,27 @@ public class BundleHelp : EditorWindow
             Object o = AssetDatabase.LoadAssetAtPath<Object>(n);
             if (o)
             {
-                var te = AssetPreview.GetAssetPreview(o);
-                if (AssetPreview.IsLoadingAssetPreview(o.GetInstanceID()))
-                {
-                    await System.Threading.Tasks.Task.Delay(100);
-                }
+                //var te = AssetPreview.GetAssetPreview(o);
+                //if (AssetPreview.IsLoadingAssetPreview(o.GetInstanceID()))
+                //{
+                //    await System.Threading.Tasks.Task.Delay(100);
+                //}
                 n = n.Remove(0, n.IndexOf("AssetsBundle") + "/AssetsBundle".Length);
-                var pre = n.Remove(n.LastIndexOf('.')) + ".png";
+                var pre = n.Remove(n.LastIndexOf('.')) + ".jpg";
                 zi.previewpath = pre;
-                if (te != null)
-                {
-                    var dir = Path.GetDirectoryName(Application.streamingAssetsPath + "/" + pre);
-                    if (!Directory.Exists(dir))
-                    {
-                        Directory.CreateDirectory(dir);
-                    }
-                    System.IO.File.WriteAllBytes(Application.streamingAssetsPath + "/" + pre, te.EncodeToPNG());
-                }
-                else
-                {
-                    Debug.LogError(o + " GetAssetPreview is null");
-                }
+                //if (te != null)
+                //{
+                //    var dir = Path.GetDirectoryName(Application.streamingAssetsPath + "/" + pre);
+                //    if (!Directory.Exists(dir))
+                //    {
+                //        Directory.CreateDirectory(dir);
+                //    }
+                //    System.IO.File.WriteAllBytes(Application.streamingAssetsPath + "/" + pre, te.EncodeToPNG());
+                //}
+                //else
+                //{
+                //    Debug.LogError(o + " GetAssetPreview is null");
+                //}
             }
         }
         System.IO.File.WriteAllText(Application.streamingAssetsPath + "/3dscene.json", LitJson.JsonMapper.ToJson(zichans));

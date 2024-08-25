@@ -45,7 +45,7 @@ public class HassEntity : MonoBehaviour
     /// <summary> Click From mouse or touch </summary>
     public virtual void Click()
     {
-        if (string.IsNullOrEmpty(entity_id))
+        if (string.IsNullOrEmpty(entity_id))//仿真
         {
             if (open)
             {
@@ -64,15 +64,15 @@ public class HassEntity : MonoBehaviour
         message.entity_id = entity_id;
         if (open)
         {
-            open = false;
+            //open = false;
             message.cmd = cmdoff;
-            TrunOff();
+            //TrunOff();
         }
         else
         {
-            open = true;
+            //open = true;
             message.cmd = cmdon;
-            TrunOn();
+            //TrunOn();
         }
         Shijie.ClickMessage(JsonUtility.ToJson(message));
     }

@@ -206,7 +206,7 @@ public class HouseWeather : HassEntity
         m.startColor = c;
     }
 
-    public async Task CreatSky(string str)
+    public async Task LoadSky(string str)
     {
         if (string.IsNullOrWhiteSpace(str) || skyname == str) return;
         skyname = str;

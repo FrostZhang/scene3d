@@ -3,31 +3,56 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EntityListPanel : MonoBehaviour
+public class EntityListPanel : MonoBehaviour, IPanel
 {
-    public Button prefab; 
+    public Button prefab, exit;
+    public InputField sec;
     List<Button> buttons;
     System.Action<string> callback;
 
     Button self;
+
+    public Transform Tr { get; set; }
+
     void Awake()
     {
-        self = GetComponent<Button>();
-        self.onClick.AddListener(() =>
+        buttons = new List<Button>(100);
+
+        sec.onEndEdit.AddListener((x) =>
         {
-            var rc = self.transform.GetChild(0) as RectTransform;
-            if (RectTransformUtility.RectangleContainsScreenPoint(rc, Input.mousePosition))
+            if (string.IsNullOrEmpty(x))
             {
+                foreach (var item in buttons)
+                {
+                    if (item.GetComponentInChildren<Text>().text.Contains(x))
+                    {
+                        item.gameObject.SetActive(true);
+                    }
+                }
                 return;
             }
-            Show(false, null);
+            foreach (var item in buttons)
+            {
+                if (item.GetComponentInChildren<Text>().text.Contains(x))
+                {
+                    item.gameObject.SetActive(true);
+                }
+                else
+                {
+                    item.gameObject.SetActive(false);
+                }
+            }
         });
-        buttons = new List<Button>(100);
-        Show(false, null);
     }
 
-    void OnEnable()
+    public void Start()
     {
+        if (House.Instance.HomeassistantEntities.Count == 0)
+        {
+            sec.text = "Œ¥º”‘ÿEntity!";
+            sec.textComponent.color = Color.red;
+            return;
+        }
         prefab.gameObject.SetActive(true);
         var p1 = Instantiate(prefab, prefab.transform.parent);
         p1.GetComponentInChildren<Text>().text = string.Empty;
@@ -37,31 +62,39 @@ public class EntityListPanel : MonoBehaviour
         {
             var p = Instantiate(prefab, prefab.transform.parent);
             var t = p.GetComponentInChildren<Text>().text = item;
-            p.onClick.AddListener(() => callback?.Invoke(t));
+            p.onClick.AddListener(() =>
+            {
+                callback?.Invoke(t);
+                Surface.surface.RemovePanel<EntityListPanel>();
+            });
             buttons.Add(p);
         }
         prefab.gameObject.SetActive(false);
+        exit.onClick.AddListener(() =>
+        {
+            Surface.surface.RemovePanel<EntityListPanel>();
+        });
+    }
+
+    void OnEnable()
+    {
+
     }
 
     void OnDisable()
     {
-        foreach (var item in buttons)
-        {
-            Destroy(item.gameObject);
-        }
-        buttons.Clear();
+
     }
 
-    public void Show(bool show, System.Action<string> back)
+    public void ChooseEntity(System.Action<string> back)
     {
         this.callback = back;
-        if (show)
-        {
-            gameObject.SetActive(true);
-        }
-        else
-        {
-            gameObject.SetActive(false);
-        }
+    }
+
+
+
+    public void OnDestroy()
+    {
+
     }
 }
