@@ -53,11 +53,11 @@ public class LightEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "Light On!");
+        EmergencyPanel.instance.Show(transform, "Light On!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "Light Off!");
+        EmergencyPanel.instance.Show(transform, "Light Off!");
     }
     public override void ReconstitutionMode(bool enter)
     {

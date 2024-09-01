@@ -4,61 +4,17 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class DrawEye : MonoBehaviour
+public class DrawEye : DrawDragBase
 {
-    public DragIcon prefab;
-    List<DragIcon> fls;
-    EditScenePanel.StandZiyuan choose;
-
-    void Awake()
+    protected override void Awake()
     {
-        prefab.gameObject.SetActive(false);
-    }
-    void Start()
-    {
-        Ini();
+        fenlei = "look";
+        menu = new string[] { "µ„Œª"};
+        menuID = new string[] { "eye" };
+        LoadMemu();
     }
 
-    async void Ini()
-    {
-        var ep = GetComponentInParent<EditScenePanel>();
-        await new WaitUntilAsync(() => ep.Standdic != null);
-        var dic = ep.Standdic;
-        if (dic.ContainsKey("look"))
-        {
-            var fs = dic["look"];
-            fls = new List<DragIcon>(fs.Count);
-            for (int i = 0; i < fs.Count; i++)
-            {
-                var f = fs[i];
-                var te = await Help.Instance.LoadTextureLocal(true, f.previewpath);
-                if (!te) continue;
-                var p = Instantiate(prefab, prefab.transform.parent);
-                p.gameObject.SetActive(true);
-                p.BeginDrag = () =>
-                {
-                    choose = f;
-                    Reconstitution.Instance.CloseRTEditor();
-                    CameraControllerForUnity.Instance.cameraMove = false;
-
-                };
-                p.EndDrag = (pointer) =>
-                {
-                    Reconstitution.Instance.OpenRTEditor();
-                    CameraControllerForUnity.Instance.cameraMove = true;
-                    if (!EventSystem.current.IsPointerOverGameObject())
-                    {
-                        CreatAreaLight();
-                    }
-                    choose = null;
-                };
-                (p.targetGraphic as RawImage).texture = te;
-                fls.Add(p);
-            }
-        }
-    }
-
-    private async void CreatAreaLight()
+    protected override async void Creat(EditScenePanel.StandZiyuan choose)
     {
         var p = Input.mousePosition;
         p = Camera.main.ScreenToWorldPoint(p);
@@ -68,7 +24,7 @@ public class DrawEye : MonoBehaviour
         wall.transform.position = p;
         wall.transform.eulerAngles = new Vector3(15, 0, 0);
         await new WaitForEndOfFrame();
-        Reconstitution.Instance.EditorTransform(wall);
+        EditMode.Instance.EditTransform(wall);
         wall.GetComponent<Eye>().ReconstitutionMode(true);
     }
 }

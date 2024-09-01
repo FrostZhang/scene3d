@@ -18,14 +18,26 @@ public class DrawLine : MonoBehaviour
             var e = await House.Instance.CreatFlowLine("0,0,0.1,2,0,0.1", -1, "255,255,255,255", "255,255,255,255", null);
             SpawnUI(e);
         });
+
+        tos = new List<Toggle>(20);
+        var dic = House.Instance.HouseData;
+        foreach (var item in dic)
+        {
+            if (item.Value.entityType == HouseEntityType.flowLine)
+            {
+                var e = item.Key.GetComponent<LineEntity>();
+                SpawnUI(e);
+            }
+        }
     }
 
-    private void Ondel()
+    public void OnLineDelete(Transform chooseTr)
     {
         if (currentTo)
         {
             tos.Remove(currentTo);
             Destroy(currentTo.gameObject);
+            currentTo = null;
         }
     }
 
@@ -45,11 +57,13 @@ public class DrawLine : MonoBehaviour
                 if (x)
                 {
                     currentTo = to;
-                    Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
+                    EditMode.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
+                    EditMode.canCheckClick = false;
                 }
                 else
                 {
-                    Reconstitution.Instance.CloseRTEditor();
+                    EditMode.Instance.CloseHandle();
+                    EditMode.canCheckClick = true;
                 }
                 add.gameObject.SetActive(x);
                 del.gameObject.SetActive(x);
@@ -60,53 +74,20 @@ public class DrawLine : MonoBehaviour
                 l.positionCount = a + 1;
                 var p = l.GetPosition(a - 1);
                 l.SetPosition(a, p + Vector3.right);
-                Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
+                EditMode.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
             });
             del.GetComponent<Button>().onClick.AddListener(() =>
             {
                 l.positionCount -= 1;
-                Reconstitution.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
+                EditMode.Instance.EditLine(e, (x) => { to.targetGraphic.color = x; });
             });
-            //to.isOn = true;
-        }
-    }
-
-    void OnEnable()
-    {
-        tos = new List<Toggle>(20);
-        var dic = House.Instance.CureetHouse;
-        foreach (var item in dic)
-        {
-            if (item.Value.entityType == HouseEntityType.flowLine)
-            {
-                var e = item.Key.GetComponent<LineEntity>();
-                SpawnUI(e);
-            }
-        }
-        PropPanle.Instance.Ondel += Ondel;
-        Reconstitution.Instance.ChangeEditorTarget += ChangeEditorTarget;
-    }
-
-    private void ChangeEditorTarget(Transform obj)
-    {
-        if (currentTo)
-        {
-            currentTo.isOn = false;
-            currentTo = null;
         }
     }
 
     void OnDisable()
     {
-        Reconstitution.Instance.CloseRTEditor();
-        foreach (var item in tos)
-        {
-            Destroy(item.gameObject);
-        }
-        tos.Clear();
         currentTo = null;
-        PropPanle.Instance.Ondel -= Ondel;
-        Reconstitution.Instance.ChangeEditorTarget -= ChangeEditorTarget;
     }
+
 
 }

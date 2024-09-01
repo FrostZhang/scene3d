@@ -6,11 +6,20 @@ public class DoorEntity : HassEntity
 {
     Coroutine coroutine;
     public float angleclose, angleopen;
+    public MeshRenderer editR;
+    private Material yuanMa;
 
+    public Material YuanMa { get => yuanMa; }
+
+    private void Awake()
+    {
+        yuanMa = editR.material = new Material(editR.material);
+
+    }
     protected virtual void Start()
     {
         GetComponent<BoxCollider>().enabled = false;
-        angleclose = transform.eulerAngles.y;
+        transform.eulerAngles = new Vector3(0, angleclose, 0);
         TrunOff();
     }
 
@@ -26,11 +35,11 @@ public class DoorEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "Door On!");
+        EmergencyPanel.instance.Show(transform, "Door On!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "Door Off!");
+        EmergencyPanel.instance.Show(transform, "Door Off!");
     }
     IEnumerator To(float f)
     {
@@ -45,5 +54,11 @@ public class DoorEntity : HassEntity
             if (l > 1)
                 break;
         }
+    }
+
+    public virtual async void Sim()
+    {
+        await To(angleopen);
+        await To(angleclose);
     }
 }

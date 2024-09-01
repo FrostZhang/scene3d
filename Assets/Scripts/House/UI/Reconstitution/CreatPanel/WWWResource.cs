@@ -82,13 +82,13 @@ public class WWWResource : MonoBehaviour
         drag.BeginDrag = () =>
         {
             choose = ziyuan;
-            Reconstitution.Instance.CloseRTEditor();
+            EditMode.Instance.CloseHandle();
             CameraControllerForUnity.Instance.cameraMove = false;
 
         };
         drag.EndDrag = (pointer) =>
         {
-            Reconstitution.Instance.OpenRTEditor();
+            EditMode.Instance.OpenHandle();
             CameraControllerForUnity.Instance.cameraMove = true;
             if (!EventSystem.current.IsPointerOverGameObject())
             {
@@ -118,7 +118,7 @@ public class WWWResource : MonoBehaviour
         wall.transform.position = p;
         await new WaitForEndOfFrame();
         wall.GetComponent<Collider>().enabled = true;
-        Reconstitution.Instance.EditorTransform(wall);
+        EditMode.Instance.EditTransform(wall);
     }
 
     private Sprite type2Sp(HouseEntityType entityType)

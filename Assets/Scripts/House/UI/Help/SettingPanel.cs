@@ -71,8 +71,7 @@ public class SettingPanel : MonoBehaviour, IPanel
 
         guanyu.onClick.AddListener(() =>
         {
-            var t = Resources.Load<Transform>("UI/SouquanPanel");
-            Instantiate(t, House.Instance.canvas);
+            Surface.surface.LoadPanel<SouquanPanel>();
         });
 
         var tts = tos.GetComponentsInChildren<Toggle>();
@@ -108,7 +107,7 @@ public class SettingPanel : MonoBehaviour, IPanel
     {
         Surface.surface.RemovePanel<SettingPanel>();
         Surface.surface.RemovePanel<HousePanel>();
-        Reconstitution.Instance.EditScene(true);
+        EditMode.EditScene(true);
     }
 
     public void OnDestroy()

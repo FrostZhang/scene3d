@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class EditScenePanel : MonoBehaviour, IPanel
+public partial class EditScenePanel : MonoBehaviour, IPanel
 {
     public static RawImage Icon;
     public Dictionary<string, List<StandZiyuan>> Standdic { get; private set; }
@@ -16,6 +16,7 @@ public class EditScenePanel : MonoBehaviour, IPanel
     public Transform mainP;
     public Transform btns, panels;
     public RawImage icon;
+    public DrawLine line;
 
     private void Awake()
     {
@@ -23,20 +24,32 @@ public class EditScenePanel : MonoBehaviour, IPanel
         Standdic = new Dictionary<string, List<StandZiyuan>>(200);
     }
 
+    public void LockCameraMode(int state)
+    {
+        changeCamera.SetValue(state);
+        changeCamera.GetComponent<Button>().interactable = false;
+        roOrMove.GetComponent<Button>().interactable = false;
+    }
+
+    public void UnLockCameraMode()
+    {
+        changeCamera.GetComponent<Button>().interactable = true;
+        roOrMove.GetComponent<Button>().interactable = true;
+        CameraControllerForUnity.Instance.roOrMove = roOrMove.State == 0;
+        Set3D2D(changeCamera.State);
+    }
+
+    public void ChangeCameraMoe(int state)
+    {
+        changeCamera.SetValue(state);
+    }
+
     public void Start()
     {
         icon.gameObject.SetActive(false);
         changeCamera.onValueChanged = (x) =>
         {
-            if (x == 0)
-            {
-                CameraControllerForUnity.Instance.Thirdfocus(new Vector3(0, -1, 0), new Vector2(45, 0), 12);
-            }
-            if (x == 1)
-            {
-                CameraControllerForUnity.Instance.transform.position = new Vector3(0, -1, 0);
-                CameraControllerForUnity.Instance.MobaFollow_orthogonal(CameraControllerForUnity.Instance.transform, new Vector2(90, 0), 15, 5);
-            }
+            Set3D2D(x);
         };
 
         roOrMove.onValueChanged = (x) =>
@@ -64,7 +77,7 @@ public class EditScenePanel : MonoBehaviour, IPanel
         });
         exit.onClick.AddListener(() =>
         {
-            Reconstitution.Instance.EditScene(false);
+            EditMode.EditScene(false);
         });
         save.onClick.AddListener(Save);
         var bs = btns.GetComponentsInChildren<Button>();
@@ -90,6 +103,30 @@ public class EditScenePanel : MonoBehaviour, IPanel
 
         LoadStandPrefab();
     }
+
+    private void Set3D2D(int x)
+    {
+        if (x == 0 && CameraControllerForUnity.Instance.mode != CameraControllerForUnity.Mode.third)
+        {
+            var p = CameraControllerForUnity.Instance.transform.position;
+            CameraControllerForUnity.Instance.Thirdfocus(p, new Vector2(45, 0), 12);
+        }
+        if (x == 1 && CameraControllerForUnity.Instance.mode != CameraControllerForUnity.Mode.moba)
+        {
+            var p = CameraControllerForUnity.Instance.transform.position;
+            CameraControllerForUnity.Instance.MobaFollow_orthogonal(CameraControllerForUnity.Instance.transform, new Vector2(90, 0), 15, 5);
+            CameraControllerForUnity.Instance.transform.position = p;
+        }
+    }
+
+    internal void OnTrDelete(Transform chooseTr)
+    {
+        if (line.gameObject.activeSelf)
+        {
+            line.OnLineDelete(chooseTr);
+        }
+    }
+
     private void Save()
     {
         var hs = House.Instance.House2Json();
@@ -104,6 +141,7 @@ public class EditScenePanel : MonoBehaviour, IPanel
         System.IO.File.WriteAllText(path, hs);
 #endif
     }
+
     private async Task LoadStandPrefab()
     {
         var te = await Help.Instance.LoadTextlocal(true, "3dscene.json", false);

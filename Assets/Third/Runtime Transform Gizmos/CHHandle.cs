@@ -108,4 +108,9 @@ public class CHHandle
             ReHandle(gizmo as ScaleGizmo);
         }
     }
+
+    public void DeleteAll()
+    {
+        UnityEngine.Object.Destroy(pa.gameObject);
+    }
 }

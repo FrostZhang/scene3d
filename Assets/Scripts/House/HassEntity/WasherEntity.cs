@@ -22,11 +22,11 @@ public class WasherEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "Washer On!");
+        EmergencyPanel.instance.Show(transform, "Washer On!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "Washer Off!");
+        EmergencyPanel.instance.Show(transform, "Washer Off!");
     }
 
     float interval = 3;

@@ -56,37 +56,39 @@ public class CreatData
 public class House : MonoBehaviour
 {
     public static House Instance;
-    public Transform entities { get; set; }
-    public Dictionary<Transform, HouseEntityData> CureetHouse { get => cureetHouse; }
-    public List<string> HomeassistantEntities { get => homeassistantEntities; }
+    public List<string> HAeys { get => homeassistantEntities; }
+    public Transform Root { get; set; }
+    public Dictionary<Transform, HouseEntityData> HouseData { get => houseData; }
 
     public Transform canvas;
     List<HassEntity> lis;
-    Dictionary<Transform, HouseEntityData> cureetHouse;
+    Dictionary<Transform, HouseEntityData> houseData;
     List<string> homeassistantEntities;
 
     void Awake()
     {
         Instance = this;
-        entities = new GameObject().transform;
+        Root = new GameObject().transform;
         mainCa = Camera.main;
         QualitySettings.SetQualityLevel(2);
         lis = new List<HassEntity>(100);
         homeassistantEntities = new List<string>(100);
-        cureetHouse = new Dictionary<Transform, HouseEntityData>(200);
+        houseData = new Dictionary<Transform, HouseEntityData>(200);
     }
 
-
+    private void OnDisable()
+    {
+        Instance = null;
+    }
+    private void OnDestroy()
+    {
+        Instance = null;
+    }
     void Start()
     {
         Surface.surface.LoadPanel<HousePanel>();
-
-        var t = Resources.Load<Transform>("UI/RunPanel");
-        Instantiate(t, canvas);
-        //var um = Resources.Load<UnityEngine.UI.UIMenu>("UI/UIMenu");
-        //um = Instantiate(um, canvas);
-        //um.transform.SetAsFirstSibling();
-        //um.gameObject.SetActive(false);
+        Surface.surface.LoadPanel<EmergencyPanel>();
+        CameraControllerForUnity.Instance.targetdis = 12;
         Shijie.OnGetConfig += OnGetConfig;
         Shijie.OnHassFlush += OnHassFlush;
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -94,11 +96,7 @@ public class House : MonoBehaviour
         WebGLInput.captureAllKeyboardInput = false;
 #endif
 
-#if UNITY_EDITOR
-        Test();
-#else
-    ReadCustomConfig();
-#endif
+        ReadCustomConfig();
 
     }
 
@@ -115,10 +113,6 @@ public class House : MonoBehaviour
         else
         {
             CreatFloor("groud1", "0,0,10,10,1,1", 0, null);
-            var data = new CreatData("text", "0,0,0.5,90,0,0,2,0.6,0.6");
-            data.color = "yellow";
-            data.moreinfo = "hello , Welcome home";
-            CreatAppliances(data);
         }
     }
 
@@ -133,6 +127,7 @@ public class House : MonoBehaviour
             OnGetConfig(te);
             return;
         }
+        return;
         TestRoom();
         await TestJson();
     }
@@ -148,7 +143,7 @@ public class House : MonoBehaviour
 
     private void OnHassFlush(string message)
     {
-        if (Reconstitution.Instance.IsEdit)
+        if (CacheData.isEditorMode)
         {
             var hid = message.Split(' ')[0];
             if (!homeassistantEntities.Contains(hid))
@@ -174,30 +169,32 @@ public class House : MonoBehaviour
         }
     }
 
-    internal void Delete(Transform lasthit)
+    internal async void Delete(Transform lasthit)
     {
-        if (CureetHouse.ContainsKey(lasthit))
+        if (HouseData.ContainsKey(lasthit))
         {
             var e = lasthit.GetComponentInChildren<HassEntity>(true);
             if (e) lis.Remove(e);
-            CureetHouse.Remove(lasthit);
+            HouseData.Remove(lasthit);
             Destroy(lasthit.gameObject);
         }
+        await Resources.UnloadUnusedAssets();
+        System.GC.Collect();
     }
 
     //float lastFlushTime;
     private void OnGetConfig(string config)
     {
-        if (Reconstitution.Instance.IsEdit)
+        if (CacheData.isEditorMode)
             return;
         var jd = JsonMapper.ToObject(config);
         if (jd == null)
             return;
-        Destroy(entities.gameObject);
+        Destroy(Root.gameObject);
         lis.Clear();
-        cureetHouse.Clear();
+        houseData.Clear();
         lis.Add(HouseWeather.Instance);//×¢²áÌìÆø
-        entities = new GameObject().transform;
+        Root = new GameObject().transform;
         if (jd.IsObject)
         {
             var dic = jd as IDictionary;
@@ -361,7 +358,7 @@ public class House : MonoBehaviour
     }
 
     /// <summary>xywh </summary>
-    public async Task<HassEntity> CreatAnim(string cusname, string str)
+    public async Task<AnimalEntity> CreatAnim(string cusname, string str)
     {
         if (string.IsNullOrEmpty(str)) return null;
         var ss = str.Split(',');
@@ -375,17 +372,13 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("animal", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        tr = Instantiate(tr, entities);
+        tr = Instantiate(tr, Root);
         tr.name = cusname;
-        var area = GameObject.CreatePrimitive(PrimitiveType.Cube).transform;
-        area.name = cusname + "_area";
-        area.transform.SetParent(entities);
-        area.position = new Vector3(x, 0, y);
-        area.localScale = new Vector3(w, 0.1f, h);
+        tr.transform.position = new Vector3(x, 0, y);
+        tr.transform.localScale = new Vector3(w, 0.1f, h);
         var animal = tr.GetComponent<AnimalEntity>();
-        animal.SetArea(area);
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.animal);
-        cureetHouse.Add(animal.transform, data);
+        houseData.Add(tr.transform, data);
         return animal;
     }
 
@@ -473,7 +466,7 @@ public class House : MonoBehaviour
         }
         if (!tr)
             return null;
-        tr = Instantiate(tr, entities);
+        tr = Instantiate(tr, Root);
         tr.name = cusname;
         var e = tr.GetComponent<HassEntity>();
         if (e)
@@ -486,7 +479,7 @@ public class House : MonoBehaviour
         }
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.appliances);
         data.supplier = supplier;
-        cureetHouse.Add(tr.transform, data);
+        houseData.Add(tr.transform, data);
         return e;
     }
     /// <summary>posxzy anglexyz scalexyz </summary>
@@ -524,10 +517,10 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("stand", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        tr = Instantiate(tr, entities);
+        tr = Instantiate(tr, Root);
         tr.name = cusname;
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.stand);
-        cureetHouse.Add(tr.transform, data);
+        houseData.Add(tr.transform, data);
         var collider = tr.GetComponent<Collider>();
         if (collider) collider.enabled = false;
         return tr.transform;
@@ -552,10 +545,10 @@ public class House : MonoBehaviour
             var tr = bs[0] as GameObject;
             if (tr)
             {
-                tr = Instantiate(tr, entities);
+                tr = Instantiate(tr, Root);
                 //tr.name = cusname;
                 HouseEntityData data = new HouseEntityData(url);
-                cureetHouse.Add(tr.transform, data);
+                houseData.Add(tr.transform, data);
                 var collider = tr.GetComponent<Collider>();
                 if (collider) collider.enabled = false;
                 return tr.transform;
@@ -600,10 +593,10 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("look", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        tr = Instantiate(tr, entities);
+        tr = Instantiate(tr, Root);
         tr.name = cusname;
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.eye);
-        cureetHouse.Add(tr.transform, data);
+        houseData.Add(tr.transform, data);
         return tr.transform;
     }
 
@@ -614,7 +607,7 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("line", "flowline");
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>("flowline");
-        var lineE = Instantiate(tr, entities).GetComponent<LineEntity>();
+        var lineE = Instantiate(tr, Root).GetComponent<LineEntity>();
         lineE.name = "line";
 
         lineE.line.positionCount = vs.Length;
@@ -630,7 +623,7 @@ public class House : MonoBehaviour
         if (Help.Instance.TryColor(coff, out c))
             lineE.SetOffc(c);
         HouseEntityData data = new HouseEntityData("flowline", HouseEntityType.flowLine);
-        cureetHouse.Add(lineE.transform, data);
+        houseData.Add(lineE.transform, data);
         var ma = lineE.line.material;
         ma = new Material(ma);
         ma.SetFloat("_Speed", speed);
@@ -661,56 +654,68 @@ public class House : MonoBehaviour
     }
 
     /// <summary>posxzy anglexyz scalexyz open</summary>
-    public async Task<DoorEntity> CreatDoor(string cusname, string str, string id, string color)
+    public async Task<HassEntity> CreatDoor(string cusname, string str, string entity, string color)
     {
         if (string.IsNullOrEmpty(str)) return null;
         var ss = str.Split(',');
-        if (ss.Length == 10)
+        if (ss.Length == 8)
         {
-            float va, x, y, z, rx, ry, rz, sx, sy, sz, open;
+            float va, x, y, z, sx, sy, sz, canshu1, canshu2;
             if (float.TryParse(ss[0], out va)) x = va; else return null;
             if (float.TryParse(ss[1], out va)) y = va; else return null;
             if (float.TryParse(ss[2], out va)) z = va; else return null;
-            if (float.TryParse(ss[3], out va)) rx = va; else return null;
-            if (float.TryParse(ss[4], out va)) ry = va; else return null;
-            if (float.TryParse(ss[5], out va)) rz = va; else return null;
-            if (float.TryParse(ss[6], out va)) sx = va; else return null;
-            if (float.TryParse(ss[7], out va)) sy = va; else return null;
-            if (float.TryParse(ss[8], out va)) sz = va; else return null;
-            if (float.TryParse(ss[9], out va)) open = va; else return null;
+            if (float.TryParse(ss[3], out va)) sx = va; else return null;
+            if (float.TryParse(ss[4], out va)) sy = va; else return null;
+            if (float.TryParse(ss[5], out va)) sz = va; else return null;
+            if (float.TryParse(ss[6], out va)) canshu1 = va; else return null;
+            if (float.TryParse(ss[7], out va)) canshu2 = va; else return null;
 
             var ab = await Help.Instance.LoadAsherlinkdataInSAssets("door", cusname);
             if (ab == null) return null;
             var tr = ab.LoadAsset<GameObject>(cusname);
-            tr = Instantiate(tr, entities);
+            tr = Instantiate(tr, Root);
             tr.name = cusname;
             var p = new Vector3(x, z, y);
             tr.transform.position = p;
-            var a = new Vector3(rx, ry, rz);
-            tr.transform.eulerAngles = a;
             var s = new Vector3(sx, sy, sz);
             tr.transform.localScale = s;
-            var le = tr.GetComponent<DoorEntity>();
-            if (!string.IsNullOrWhiteSpace(id))
-            {
-                le.SetEntity(id);
-                lis.Add(le);
-            }
-            HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.door);
-            cureetHouse.Add(tr.transform, data);
-            le.angleopen = open;
-            Color sc;
-            if (Help.Instance.TryColor(color, out sc))
-            {
-                var mr = tr.GetComponent<MeshRenderer>();
-                if (!mr) return null;
-                var ma = new Material(mr.material);
-                ma.color = sc;
-                mr.material = ma;
-            }
+
             var collider = tr.GetComponent<Collider>();
             if (collider) collider.enabled = false;
-            return le;
+
+            HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.door);
+            houseData.Add(tr.transform, data);
+
+            var le = tr.GetComponent<DoorEntity>();
+            if (le)
+            {
+                if (!string.IsNullOrWhiteSpace(entity))
+                    le.SetEntity(entity);
+                lis.Add(le);
+                le.angleclose = canshu1;
+                le.angleopen = canshu2;
+                Color sc;
+                if (Help.Instance.TryColor(color, out sc))
+                {
+                    le.YuanMa.color = sc;
+                }
+                return le;
+            }
+            var sdoor = tr.GetComponent<SlidingDoorEntity>();
+            if (sdoor)
+            {
+                if (!string.IsNullOrWhiteSpace(entity))
+                    sdoor.SetEntity(entity);
+                lis.Add(sdoor);
+                tr.transform.eulerAngles = new Vector3(0, canshu1, 0);
+                sdoor.iszuoyi = canshu2 > 0;
+                Color sc;
+                if (Help.Instance.TryColor(color, out sc))
+                {
+                    sdoor.YuanMa.color = sc;
+                }
+                return sdoor;
+            }
         }
         return null;
     }
@@ -733,7 +738,7 @@ public class House : MonoBehaviour
             //var ab = Help.Instance.GetBundle("light", "arealight");
             //var tr = ab.LoadAsset<GameObject>("arealight");
             var prefab = transform.Find("arealight");
-            var tr = Instantiate(prefab, entities);
+            var tr = Instantiate(prefab, Root);
             tr.name = "light";
             tr.transform.position = new Vector3(x, 0.01f, y);
             tr.transform.localScale = new Vector3(w, 0.1f, h);
@@ -745,7 +750,7 @@ public class House : MonoBehaviour
                 lis.Add(le);
             }
             HouseEntityData data = new HouseEntityData("arealight", HouseEntityType.arealight);
-            cureetHouse.Add(tr.transform, data);
+            houseData.Add(tr.transform, data);
             le.clight.intensity = li;
             Color c;
             if (Help.Instance.TryColor(color, out c))
@@ -774,7 +779,7 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("floor", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        tr = Instantiate(tr, entities);
+        tr = Instantiate(tr, Root);
         tr.name = cusname;
         tr.transform.position = new Vector3(x, priority * 0.01f, y);
         tr.transform.localScale = new Vector3(w, 1, h);
@@ -786,7 +791,7 @@ public class House : MonoBehaviour
             ma.color = c;
         tr.GetComponent<MeshRenderer>().material = ma;
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.floor);
-        cureetHouse.Add(tr.transform, data);
+        houseData.Add(tr.transform, data);
         var collider = tr.GetComponent<Collider>();
         if (collider) collider.enabled = false;
         return tr.transform;
@@ -811,9 +816,9 @@ public class House : MonoBehaviour
         var ab = await Help.Instance.LoadAsherlinkdataInSAssets("wall", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
-        var cube = Instantiate(tr, entities);
+        var cube = Instantiate(tr, Root);
         cube.name = tr.name;
-        cube.transform.SetParent(entities);
+        cube.transform.SetParent(Root);
         cube.transform.localPosition = new Vector3(x, z, y);
         cube.transform.localScale = new Vector3(w, h, t);
         cube.transform.localEulerAngles = new Vector3(0, a, 0);
@@ -825,7 +830,7 @@ public class House : MonoBehaviour
             r.material.color = wcolor;
         }
         HouseEntityData data = new HouseEntityData(cusname, HouseEntityType.wall);
-        cureetHouse.Add(cube.transform, data);
+        houseData.Add(cube.transform, data);
         var collider = tr.GetComponent<Collider>();
         if (collider) collider.enabled = false;
         return cube.transform;
@@ -838,9 +843,9 @@ public class House : MonoBehaviour
     HassEntity entity;
     Vector3 lastDownpos;
     float lastDownT;
-    void Update()
+    private void FixedUpdate()
     {
-        if (Reconstitution.Instance.IsEdit)
+        if (CacheData.isEditorMode)
             return;
         if (Physics.Raycast(mainCa.ScreenPointToRay(Input.mousePosition), out hit, maxDistance))
         {
@@ -1119,7 +1124,7 @@ public class House : MonoBehaviour
 
     public string House2Json()
     {
-        var hs = from a in cureetHouse
+        var hs = from a in houseData
                  group a by a.Value.entityType;
         JsonWriter writer = new JsonWriter();
         writer.WriteObjectStart();
@@ -1198,7 +1203,7 @@ public class House : MonoBehaviour
             var tr = g.Key;
             var anim = tr.GetComponent<AnimalEntity>();
             writer.WritePropertyName("pos");
-            var item = anim.Area;
+            var item = anim.transform;
             writer.Write($"{item.position.x:f2},{item.position.z:f2},{item.localScale.x:f2},{item.localScale.z:f2}");
             if (!string.IsNullOrEmpty(g.Value.url))
             {
@@ -1381,13 +1386,36 @@ public class House : MonoBehaviour
             writer.WriteObjectStart();
             var tr = item.Key;
             var door = tr.GetComponent<DoorEntity>();
-            writer.WritePropertyName("pos");
-            writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.position.y:f2},{tr.eulerAngles.x:f2},{tr.eulerAngles.y:f2},{tr.eulerAngles.z:f2},{tr.localScale.x:f2},{tr.localScale.y:f2},{tr.localScale.z:f2},{door.angleopen}");
-            writer.WritePropertyName("color");
-            Color32 ma = tr.GetComponent<MeshRenderer>().material.color;
-            writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
-            writer.WritePropertyName("entity");
-            writer.Write(door.Entity_id);
+            if (door)
+            {
+                writer.WritePropertyName("pos");
+                writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.position.y:f2}," +
+                    $"{tr.localScale.x:f2},{tr.localScale.y:f2},{tr.localScale.z:f2}," +
+                    $"{door.angleclose},{door.angleopen}");
+
+                writer.WritePropertyName("color");
+                Color32 ma = door.YuanMa.color;
+                writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
+
+                writer.WritePropertyName("entity");
+                writer.Write(door.Entity_id);
+            }
+            else
+            {
+                var sdoor = tr.GetComponent<SlidingDoorEntity>();
+                var scode = sdoor.iszuoyi ? 1 : 0;
+                writer.WritePropertyName("pos");
+                writer.Write($"{tr.position.x:f2},{tr.position.z:f2},{tr.position.y:f2}," +
+                    $"{tr.localScale.x:f2},{tr.localScale.y:f2},{tr.localScale.z:f2}," +
+                    $"{tr.eulerAngles.y},{scode}");
+
+                writer.WritePropertyName("color");
+                Color32 ma = sdoor.YuanMa.color;
+                writer.Write($"{ma.r},{ma.g},{ma.b},{ma.a}");
+
+                writer.WritePropertyName("entity");
+                writer.Write(sdoor.Entity_id);
+            }
             writer.WriteObjectEnd();
             writer.WriteObjectEnd();
         }
@@ -1484,5 +1512,72 @@ public class House : MonoBehaviour
             writer.WriteObjectEnd();
         }
         writer.WriteArrayEnd();
+    }
+
+
+    //¼æÈÝ¾É°æ±¾
+    public string J_Stand20240901(string oldname)
+    {
+        if (oldname == "aloe")
+        {
+            return "lvzhi";
+        }
+        if (oldname == "computertable")
+        {
+            return "zhuozi4";
+        }
+        if (oldname == "electricball")
+        {
+            return "other";
+        }
+        if (oldname == "luodijing")
+        {
+            return "other1";
+        }
+        if (oldname == "recttable1")
+        {
+            return "chaji";
+        }
+        if (oldname == "recttable3")
+        {
+            return "chaji3";
+        }
+        if (oldname == "roundtable1")
+        {
+            return "chaji2";
+        }
+        if (oldname == "shelving")
+        {
+            return "yushi4";
+        }
+        if (oldname == "shower")
+        {
+            return "yushi4";
+        }
+        if (oldname == "tree")
+        {
+            return "lvzhi2";
+        }
+        if (oldname == "tvstand")
+        {
+            return "zhuozi2";
+        }
+        if (oldname == "wc")
+        {
+            return "yushi5";
+        }
+        if (oldname == "yushigui")
+        {
+            return "yushi1";
+        }
+        if (oldname == "yushigui2")
+        {
+            return "yushi2";
+        }
+        if (oldname == "yushigui3")
+        {
+            return "yushi3";
+        }
+        return oldname;
     }
 }

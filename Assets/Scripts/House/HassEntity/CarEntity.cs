@@ -32,15 +32,15 @@ public class CarEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "Car home!");
+        EmergencyPanel.instance.Show(transform, "Car home!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "Car Leave home!");
+        EmergencyPanel.instance.Show(transform, "Car Leave home!");
     }
     protected override void HassDestine(string state)
     {
-        RunPanel.instance.Show(transform, state);
+        EmergencyPanel.instance.Show(transform, state);
     }
     public override void ReconstitutionMode(bool enter)
     {

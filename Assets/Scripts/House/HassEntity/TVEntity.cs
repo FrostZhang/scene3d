@@ -42,11 +42,11 @@ public class TVEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "TV On!");
+        EmergencyPanel.instance.Show(transform, "TV On!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "TV Off!");
+        EmergencyPanel.instance.Show(transform, "TV Off!");
     }
     public override void ReconstitutionMode(bool enter)
     {

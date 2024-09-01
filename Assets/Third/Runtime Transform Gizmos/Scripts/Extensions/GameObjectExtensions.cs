@@ -754,7 +754,7 @@ namespace RTEditor
             {
                 return null;
             }
-            MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
+            MeshFilter meshFilter = gameObject.GetComponentInChildren<MeshFilter>();
             if (meshFilter != null && meshFilter.sharedMesh != null) return meshFilter.sharedMesh;
 
             return null;

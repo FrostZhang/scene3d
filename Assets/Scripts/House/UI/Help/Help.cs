@@ -122,7 +122,6 @@ public class Help : MonoBehaviour
         return await LoadAssetBundle(bundleID, uri);
     }
 
-
     public async Task<AssetBundle> LoadAsherlinkdataInWWW(string bundleID, System.Uri uri)
     {
         if (bundles.ContainsKey(bundleID))
@@ -160,10 +159,10 @@ public class Help : MonoBehaviour
         return res;
     }
 
-    public async Task<Texture2D> LoadTextureLocal(bool sAssetsOrcusdata, string path)
+    public async Task<Texture2D> LoadTextureLocal(bool streamingAssets, string path)
     {
         System.Uri uri;
-        if (sAssetsOrcusdata)
+        if (streamingAssets)
         {
             uri = new System.Uri(streamingAssetsPath + "/" + path);
         }

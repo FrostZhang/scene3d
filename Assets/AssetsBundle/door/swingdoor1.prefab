@@ -98,6 +98,7 @@ MonoBehaviour:
   editC: {fileID: 8840822530232562230}
   angleclose: 0
   angleopen: 0
+  editR: {fileID: 85956866791890817}
 --- !u!65 &8840822530232562230
 BoxCollider:
   m_ObjectHideFlags: 0

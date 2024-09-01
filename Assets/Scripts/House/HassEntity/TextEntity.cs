@@ -10,7 +10,7 @@ public class TextEntity : HassEntity
     public TextMesh textMesh;
 
     public string front, back;
-    public string value = "?";
+    public string value = " ";
     void Start()
     {
         textMesh.font = Help.Instance.chinese;
@@ -62,6 +62,6 @@ public class TextEntity : HassEntity
     internal void FlushText()
     {
         textMesh.text = front + value + back;
-        RunPanel.instance.Show(transform, textMesh.text);
+        EmergencyPanel.instance.Show(transform, textMesh.text);
     }
 }

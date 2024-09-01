@@ -5,112 +5,58 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class Drawlight : MonoBehaviour
+public class Drawlight : DrawAreaBase
 {
     public ToggleGroup tg;
-    Toggle[] tgs;
-
-    bool draw;
     Color32 lightC;
-    private Vector3 oldpos;
-    private bool candraw;
-    Material discMaterial;
-    void Awake()
+    protected override void Awake()
     {
-        tgs = tg.GetComponentsInChildren<Toggle>();
-
-        foreach (var item in tgs)
+        fls = new List<Toggle>(tg.GetComponentsInChildren<Toggle>());
+        foreach (var item in fls)
         {
             item.onValueChanged.AddListener(OnSelectChange);
         }
-
-        discMaterial = RTEditor.MaterialPool.Instance.GizmoSolidComponent;
-        discMaterial.SetInt("_ZTest", 0);
-        discMaterial.SetInt("_ZWrite", 1);
-        discMaterial.SetInt("_IsLit", 0);
-        discMaterial.SetInt("_CullMode", 0);
     }
 
     private void OnSelectChange(bool b)
     {
         if (b)
         {
-            foreach (var item in tgs)
+            foreach (var item in fls)
             {
                 if (item.isOn)
                 {
                     lightC = item.targetGraphic.color;
-                    Reconstitution.Instance.CloseRTEditor();
-                    CameraControllerForUnity.Instance.cameraMove = false;
-                    draw = true;
-                    break;
+                    StartChoose();
+                    return;
                 }
             }
         }
         else
         {
-            Reconstitution.Instance.OpenRTEditor();
-            CameraControllerForUnity.Instance.cameraMove = true;
-            draw = false;
-            candraw = false;
-        }
-    }
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (!draw || EventSystem.current.IsPointerOverGameObject()) return;
-            oldpos = Input.mousePosition;
-            candraw = true;
-        }
-        else if (Input.GetMouseButtonUp(0))
-        {
-            candraw = false;
-            if (!draw || EventSystem.current.IsPointerOverGameObject()) return;
-            CreatAreaLight();
+            EndChoose();
         }
     }
 
-    public async void CreatAreaLight()
+    protected override async void DrawObject()
     {
         var p = Input.mousePosition;
-        if (Mathf.Abs(p.x - oldpos.x) < 10 || Mathf.Abs(p.y - oldpos.y) < 10) return;
-        oldpos = Camera.main.ScreenToWorldPoint(oldpos);
+        if (Mathf.Abs(p.x - drawStartpos.x) < 10 || Mathf.Abs(p.y - drawStartpos.y) < 10) return;
+        drawStartpos = Camera.main.ScreenToWorldPoint(drawStartpos);
         p = Camera.main.ScreenToWorldPoint(p);
-        var size = p - oldpos;
-        var center = oldpos + size * 0.5f;
+        var size = p - drawStartpos;
+        var center = drawStartpos + size * 0.5f;
         var light = House.Instance.CreatAreaLight($"{center.x},{center.z},{Mathf.Abs(size.x)},{Mathf.Abs(size.z)},3"
             , null
             , $"{lightC.r},{lightC.g},{lightC.b},{lightC.a}"
             );
         await new WaitForEndOfFrame();
         light.ReconstitutionMode(true);
-        foreach (var item in tgs)
+        foreach (var item in fls)
         {
             item.isOn = false;
         }
-        Reconstitution.Instance.EditorTransform(light.transform);
+        EditMode.Instance.EditTransform(light.transform);
     }
 
-    void OnRenderObject()
-    {
-        if (candraw)
-        {
-            GL.PushMatrix();
-            discMaterial.SetPass(0);
-            GL.LoadOrtho();
-            GL.Begin(GL.LINE_STRIP);
-            GL.Color(lightC);
-            var v1 = new Vector3(oldpos.x / Screen.width, oldpos.y / Screen.height, oldpos.z);
-            var v2 = new Vector3(Input.mousePosition.x / Screen.width, Input.mousePosition.y / Screen.height, Input.mousePosition.z);
-            GL.Vertex(v1);
-            GL.Vertex(new Vector3(v1.x, v2.y, v2.z));
-            GL.Vertex(v2);
-            GL.Vertex(new Vector3(v2.x, v1.y, v2.z));
-            GL.Vertex(v1);
-            GL.End();
-            GL.PopMatrix();
-        }
-
-    }
 }

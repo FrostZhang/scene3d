@@ -58,7 +58,7 @@ Shader "Gizmo Solid Component"
 			{
 				vOutput o;
 				o.clipPos = UnityObjectToClipPos(input.vertexPos);
-				o.worldNormal = mul(float4(input.vertexNormal, 0.0f), unity_WorldToObject);
+				//o.worldNormal = mul(float4(input.vertexNormal, 0.0f), unity_WorldToObject);
 
 				return o;
 			}
@@ -68,13 +68,13 @@ Shader "Gizmo Solid Component"
 				if(_IsLit == 0) return _Color;
 				else
 				{
-					o.worldNormal = normalize(o.worldNormal);
+					//o.worldNormal = normalize(o.worldNormal);
 
-					float minInfluence = 0.35f;
-					float lightInfluence = saturate(dot(-_LightDir.xyz, o.worldNormal));
-					lightInfluence = saturate(lightInfluence + minInfluence * (1.0f - lightInfluence));
+					//float minInfluence = 0.35f;
+					//float lightInfluence = saturate(dot(-_LightDir.xyz, o.worldNormal));
+					//lightInfluence = saturate(lightInfluence + minInfluence * (1.0f - lightInfluence));
 
-					return _Color * float4(lightInfluence * _LightIntensity, lightInfluence * _LightIntensity, lightInfluence * _LightIntensity, 1.0f);
+					return _Color ;//* float4(lightInfluence * _LightIntensity, lightInfluence * _LightIntensity, lightInfluence * _LightIntensity, 1.0f);
 				}
 			}
 			ENDCG

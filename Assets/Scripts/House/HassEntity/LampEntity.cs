@@ -36,11 +36,11 @@ public class LampEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "Lamp On!");
+        EmergencyPanel.instance.Show(transform, "Lamp On!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "Lamp Off!");
+        EmergencyPanel.instance.Show(transform, "Lamp Off!");
     }
     public override void ReconstitutionMode(bool enter)
     {

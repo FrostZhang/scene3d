@@ -5,59 +5,61 @@ using UnityEngine;
 public class AnimalEntity : HassEntity
 {
     public static int info = Animator.StringToHash("AnimInfo");
+
     public Animator anim;
-    public Transform Area { get => area; }
     public bool canmove;
-    Transform area;
-
-
-    public void SetArea(Transform plane)
-    {
-        area = plane;
-        area.gameObject.SetActive(Reconstitution.Instance.IsEdit);
-        transform.position = plane.position;
-    }
+    public Transform body;
 
     void Start()
     {
-        if (canmove)
-        {
-            NextAnim();
-        }
+        ShowEditMesh(CacheData.isEditorMode);
+        GetComponent<BoxCollider>().enabled = false;
+        NextAnim();
+        body.SetParent(transform.parent);
+        body.localScale = Vector3.one;
     }
 
-    bool CheckArea()
+    private void OnDestroy()
     {
-        if (!area)
+        if (body.parent != transform)
         {
-            if (transform)
-            {
-                Destroy(gameObject);
-                return false;
-            }
+            Destroy(body.gameObject);
         }
-        return true;
     }
 
     private void NextAnim()
     {
-        if (!transform) return;
-        if (!CheckArea())
+        if (!transform)
         {
+            Debug.LogError("£¡£¡£¡£¡£¡");
             return;
         }
-        if (Random.value > 0.4f)
+        if (!canmove)
         {
-            Vector3 pos = area.TransformPoint(new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f));
-            StartCoroutine(WalkTo(pos));
+            StartCoroutine(SetPos());
         }
         else
         {
-            StartCoroutine(Stand());
+            if (Random.value > 0.4f)
+            {
+                Vector3 pos = transform.TransformPoint(new Vector3(Random.value - 0.5f, 0, Random.value - 0.5f));
+                StartCoroutine(WalkTo(pos));
+            }
+            else
+            {
+                StartCoroutine(StandAnim());
+            }
         }
     }
 
-    IEnumerator Stand()
+    IEnumerator SetPos()
+    {
+        body.position = transform.position;
+        yield return new WaitForSeconds(Random.value * 10);
+        NextAnim();
+    }
+
+    IEnumerator StandAnim()
     {
         anim.SetInteger(info, 0);
         yield return new WaitForSeconds(Random.value * 10);
@@ -66,15 +68,15 @@ public class AnimalEntity : HassEntity
 
     IEnumerator WalkTo(Vector3 pos)
     {
-        var p = transform.position;
+        var p = body.position;
         float t = 0;
         var speed = Vector3.Distance(pos, p);
         speed = 1 / speed;
         anim.SetInteger(info, 1);
-        transform.LookAt(pos);
-        while (transform)
+        body.LookAt(pos);
+        while (body)
         {
-            transform.position = Vector3.Lerp(p, pos, t += Time.deltaTime * speed);
+            body.position = Vector3.Lerp(p, pos, t += Time.deltaTime * speed);
             if (t > 1)
                 break;
             yield return new WaitForEndOfFrame();
@@ -85,6 +87,11 @@ public class AnimalEntity : HassEntity
     public override void ReconstitutionMode(bool enter)
     {
         base.ReconstitutionMode(enter);
-        area.gameObject.SetActive(enter);
+        ShowEditMesh(enter);
+    }
+
+    void ShowEditMesh(bool isedit)
+    {
+        GetComponent<MeshRenderer>().enabled = isedit;
     }
 }

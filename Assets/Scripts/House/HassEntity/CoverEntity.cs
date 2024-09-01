@@ -35,11 +35,11 @@ public class CoverEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "Door On!");
+        EmergencyPanel.instance.Show(transform, "Door On!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "Door Off!");
+        EmergencyPanel.instance.Show(transform, "Door Off!");
     }
     IEnumerator To(float f)
     {

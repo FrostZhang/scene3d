@@ -47,18 +47,25 @@ public class EntityListPanel : MonoBehaviour, IPanel
 
     public void Start()
     {
-        if (House.Instance.HomeassistantEntities.Count == 0)
+        exit.onClick.AddListener(() =>
+        {
+            Surface.surface.RemovePanel<EntityListPanel>();
+        });
+
+        if (House.Instance.HAeys.Count == 0)
         {
             sec.text = "Œ¥º”‘ÿEntity!";
             sec.textComponent.color = Color.red;
+            prefab.gameObject.SetActive(false);
             return;
         }
+
         prefab.gameObject.SetActive(true);
         var p1 = Instantiate(prefab, prefab.transform.parent);
         p1.GetComponentInChildren<Text>().text = string.Empty;
         p1.onClick.AddListener(() => callback?.Invoke(string.Empty));
         buttons.Add(p1);
-        foreach (var item in House.Instance.HomeassistantEntities)
+        foreach (var item in House.Instance.HAeys)
         {
             var p = Instantiate(prefab, prefab.transform.parent);
             var t = p.GetComponentInChildren<Text>().text = item;
@@ -70,10 +77,6 @@ public class EntityListPanel : MonoBehaviour, IPanel
             buttons.Add(p);
         }
         prefab.gameObject.SetActive(false);
-        exit.onClick.AddListener(() =>
-        {
-            Surface.surface.RemovePanel<EntityListPanel>();
-        });
     }
 
     void OnEnable()

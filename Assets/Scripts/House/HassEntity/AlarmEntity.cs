@@ -12,7 +12,7 @@ public class AlarmEntity : HassEntity
 
     void Awake()
     {
-        yuanMa = editR.material;
+        yuanMa = editR.material = new Material(editR.material);
         TrunOff();
         editC = GetComponent<Collider>();
         editC.enabled = false;
@@ -33,11 +33,11 @@ public class AlarmEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "Alarm On!");
+        EmergencyPanel.instance.Show(transform, "Alarm On!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "Alarm Off!");
+        EmergencyPanel.instance.Show(transform, "Alarm Off!");
     }
     public override void ReconstitutionMode(bool enter)
     {

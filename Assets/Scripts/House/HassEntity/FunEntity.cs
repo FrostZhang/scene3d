@@ -30,11 +30,11 @@ public class FunEntity : HassEntity
     }
     protected override void HassStateOn()
     {
-        RunPanel.instance.Show(transform, "Fun On!");
+        EmergencyPanel.instance.Show(transform, "Fun On!");
     }
     protected override void HassStateOff()
     {
-        RunPanel.instance.Show(transform, "Fun Off!");
+        EmergencyPanel.instance.Show(transform, "Fun Off!");
     }
     public override void ReconstitutionMode(bool enter)
     {
