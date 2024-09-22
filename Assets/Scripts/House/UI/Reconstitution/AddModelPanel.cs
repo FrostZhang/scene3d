@@ -62,7 +62,7 @@ public class AddModelPanel : MonoBehaviour
             }
             cgroup.interactable = false;
             err.text = "Loading ...";
-            var bundle = await Help.Instance.LoadAsherlinkdataInWWW(url, new System.Uri(url));
+            var bundle = await Help.Instance.Load_Asdata_www(url, new System.Uri(url));
             if (!gameObject)
                 return;
             if (bundle != null)
@@ -117,7 +117,7 @@ public class AddModelPanel : MonoBehaviour
                 return;
             }
             cgroup.interactable = false;
-            var bundle = await Help.Instance.LoadAsherlinkdataInWWW(cusurl, new System.Uri(cusurl));
+            var bundle = await Help.Instance.Load_Asdata_www(cusurl, new System.Uri(cusurl));
             if (!gameObject)
                 return;
             if (bundle != null)

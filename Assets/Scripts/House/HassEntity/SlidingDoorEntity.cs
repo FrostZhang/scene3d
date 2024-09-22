@@ -34,14 +34,6 @@ public class SlidingDoorEntity : HassEntity
         StopAllCoroutines();
         coroutine = StartCoroutine(Close());
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "Door On!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "Door Off!");
-    }
     IEnumerator Open()
     {
         float l = 0;

@@ -56,14 +56,13 @@ public class CreatData
 public class House : MonoBehaviour
 {
     public static House Instance;
-    public List<string> HAeys { get => homeassistantEntities; }
+    public JsonData Hass { get; private set; }
     public Transform Root { get; set; }
     public Dictionary<Transform, HouseEntityData> HouseData { get => houseData; }
 
-    public Transform canvas;
+    public Transform arealightPrefab;
     List<HassEntity> lis;
     Dictionary<Transform, HouseEntityData> houseData;
-    List<string> homeassistantEntities;
 
     void Awake()
     {
@@ -72,18 +71,22 @@ public class House : MonoBehaviour
         mainCa = Camera.main;
         QualitySettings.SetQualityLevel(2);
         lis = new List<HassEntity>(100);
-        homeassistantEntities = new List<string>(100);
         houseData = new Dictionary<Transform, HouseEntityData>(200);
+        //var gltfCom = GetComponent<UnityGLTF.GLTFComponent>();
+        //gltfCom.GLTFUri = Application.streamingAssetsPath + "/Customdata/test.glb";
+        //gltfCom.Load();
     }
 
     private void OnDisable()
     {
         Instance = null;
     }
+
     private void OnDestroy()
     {
         Instance = null;
     }
+
     void Start()
     {
         Surface.surface.LoadPanel<HousePanel>();
@@ -91,21 +94,16 @@ public class House : MonoBehaviour
         CameraControllerForUnity.Instance.targetdis = 12;
         Shijie.OnGetConfig += OnGetConfig;
         Shijie.OnHassFlush += OnHassFlush;
-#if UNITY_WEBGL && !UNITY_EDITOR
-        Shijie.Link3DStart();
-        WebGLInput.captureAllKeyboardInput = false;
-#endif
-
         ReadCustomConfig();
-
+        //TestRoom();
     }
 
     private async void ReadCustomConfig()
     {
-        var te = await Help.Instance.LoadTextlocal(false, "houseconnfig.json", false);
+        var te = await Help.Instance.LoadCustomDirText("houseconnfig.json", false);
         if (te != null)
         {
-            if (te.StartsWith(""))
+            if (te.StartsWith("\""))
                 te = te.TrimStart('\"').TrimEnd('\"');
             te = te.Replace("None", "null");
             OnGetConfig(te);
@@ -118,7 +116,7 @@ public class House : MonoBehaviour
 
     private async void Test()
     {
-        var te = await Help.Instance.LoadTextlocal(true, "Customdata/houseconnfig.json");
+        var te = await Help.Instance.LoadCustomDirText("houseconnfig.json", true);
         if (te != null)
         {
             if (te.StartsWith(""))
@@ -143,30 +141,38 @@ public class House : MonoBehaviour
 
     private void OnHassFlush(string message)
     {
-        if (CacheData.isEditorMode)
+        if (message == null) return;
+        try
         {
-            var hid = message.Split(' ')[0];
-            if (!homeassistantEntities.Contains(hid))
-            {
-                homeassistantEntities.Add(hid);
-            }
+            Hass = JsonMapper.ToObject(message);
+        }
+        catch (System.Exception)
+        {
+            Debug.Log(message);
             return;
         }
-        var ss = message.Split(' ');
-        var id = ss[0];
-        var va = ss[1];
-        if (CacheData.AutoSun && id == "sun.sun")
+        if (CacheData.isEditorMode) return;
+
+        Hass.Foreach((key, data) =>
         {
-            AnsSun(va);
-        }
-        else
-        {
-            foreach (var item in lis)
+            if (CacheData.AutoSun && key == "sun.sun")
             {
-                if (item.Entity_id == id)
-                    item.StateMeassge(va);
+                if (data["attributes"] != null)
+                {
+                    var json = data["attributes"]["elevation"];
+                    if (json != null)
+                        AnsSun(double.Parse(json.ToString()));
+                }
             }
-        }
+            else
+            {
+                foreach (var item in lis)
+                {
+                    if (item.Entity_id == key)
+                        item.StateMeassge(data);
+                }
+            }
+        });
     }
 
     internal async void Delete(Transform lasthit)
@@ -226,19 +232,15 @@ public class House : MonoBehaviour
     }
 
 
-    private void AnsSun(string va)
+    private void AnsSun(double elevation)
     {
-        float value;
-        if (float.TryParse(va, out value))
+        if (elevation > 0)
         {
-            if (value > 0)
-            {
-                var v2 = Mathf.Max(0.1f, Mathf.Sin(value * Mathf.Deg2Rad));
-                HouseWeather.Instance.SetTianGuang(v2);
-            }
-            else
-                HouseWeather.Instance.SetTianGuang(0.1f);
+            var v2 = Mathf.Max(0.1f, Mathf.Sin((float)elevation * Mathf.Deg2Rad));
+            HouseWeather.Instance.SetTianGuang(v2);
         }
+        else
+            HouseWeather.Instance.SetTianGuang(0.1f);
     }
 
     private void TestRoom()
@@ -335,20 +337,20 @@ public class House : MonoBehaviour
         CreatAreaLight("0.593,0.33,4,0.8,5", "light.xxx", "178,149,70,255");
         CreatAreaLight("1.22,2.4,1.79,0.8,2", "light.xxx", null);
 
-        //CreatFlowLine("-3.614539,4.459235,-1.1,-4.868434,4.454682,-1.1,-4.895442,-3.080526,-1.1,-4.211635,-3.101046,-1.1,-4.195337,-4.541389,-1.1,-1.315552,-4.536458,-1.1,0.6916895,-4.544263,-1.1,0.7049857,-3.88601,-1.1,2.096153,-3.88601,-1.1,2.096153,-4.559184,-1.1,4.226263,-4.559184,-1.1,4.226263,-3.867848,-1.1,4.944883,-3.867568,-1.1,4.896365,2.945096,-1.1,-2.157866,2.945096,-1.1,-2.157866,4.409803,-1.1",
-        //                             -1, "255,255,255,255", "red", "switch.xxxx"));
-        //CreatFlowLine("-3.979907,3.786215,1,-3.979907,3.782755,0.1,-3.162498,3.782755,0.1,-3.162498,0.4754077,0.1,1.302327,0.4013318,0.1,1.296336,-1.111547,0.1,-0.9975456,-1.101645,0.1,-1.026982,-3.49305,0.1,1.298337,-3.513381,0.1",
-        //    -1, "0,165,255,255", "red", "");
-        //CreatFlowLine("1.34175,0.4129494,0.1,2.299839,0.4083416,0.1,2.300617,-1.182749,0.1,4.609478,-1.177224,0.1,4.586144,-3.498736,0.1,2.178244,-3.516147,0.1",
-        //    -1, "255,210,0,255", "red", "");
-        //CreatFlowLine("1.34175,0.5860035,0.1,3.917953,0.5754554,0.1,3.923838,1.181043,0.1,2.362754,1.187165,0.1",
-        //    -1, "0,255,223,255", "red", "");
-        //CreatFlowLine("-1.931547,0.3116443,0.1,-1.901711,-2.992601,0.1,-1.968843,-2.982793,1.1,-1.968843,-3.266867,1.1,-1.968843,-3.267096,0.1,-1.968843,-3.869098,0.1",
-        //    -1, "0,255,223,255", "red", "");
-        //CreatFlowLine("-2.123267,-2.820107,0.1,-4.781082,-2.769531,0.1,-4.776298,-2.776958,0.9,-4.732517,0.1199159,0.9,-4.721735,0.1224415,0.3",
-        //    -1, "255,210,0,255", "red", "");
-        //CreatFlowLine("-3.035549,2.620526,0.1,0.1451162,2.608722,0.1,0.1221144,2.625938,1.1,1.986478,2.625938,1.1,2.006577,1.321079,1.1,1.997306,1.308576,0.9",
-        //    -1, "255,0,252,255", "red", "");
+        CreatFlowLine("-3.614539,4.459235,1.1,-4.868434,4.454682,1.1,-4.895442,-3.080526,1.1,-4.211635,-3.101046,1.1,-4.195337,-4.541389,1.1,-1.315552,-4.536458,1.1,0.6916895,-4.544263,1.1,0.7049857,-3.88601,1.1,2.096153,-3.88601,1.1,2.096153,-4.559184,1.1,4.226263,-4.559184,1.1,4.226263,-3.867848,1.1,4.944883,-3.867568,1.1,4.896365,2.945096,1.1,-2.157866,2.945096,1.1,-2.157866,4.409803,1.1",
+                                     -1, "255,255,255,255", "red", "switch.xxxx");
+        CreatFlowLine("-3.979907,3.786215,1,-3.979907,3.782755,0.1,-3.162498,3.782755,0.1,-3.162498,0.4754077,0.1,1.302327,0.4013318,0.1,1.296336,-1.111547,0.1,-0.9975456,-1.101645,0.1,-1.026982,-3.49305,0.1,1.298337,-3.513381,0.1",
+            -1, "0,165,255,255", "red", "");
+        CreatFlowLine("1.34175,0.4129494,0.1,2.299839,0.4083416,0.1,2.300617,-1.182749,0.1,4.609478,-1.177224,0.1,4.586144,-3.498736,0.1,2.178244,-3.516147,0.1",
+            -1, "255,210,0,255", "red", "");
+        CreatFlowLine("1.34175,0.5860035,0.1,3.917953,0.5754554,0.1,3.923838,1.181043,0.1,2.362754,1.187165,0.1",
+            -1, "0,255,223,255", "red", "");
+        CreatFlowLine("-1.931547,0.3116443,0.1,-1.901711,-2.992601,0.1,-1.968843,-2.982793,1.1,-1.968843,-3.266867,1.1,-1.968843,-3.267096,0.1,-1.968843,-3.869098,0.1",
+            -1, "0,255,223,255", "red", "");
+        CreatFlowLine("-2.123267,-2.820107,0.1,-4.781082,-2.769531,0.1,-4.776298,-2.776958,0.9,-4.732517,0.1199159,0.9,-4.721735,0.1224415,0.3",
+            -1, "255,210,0,255", "red", "");
+        CreatFlowLine("-3.035549,2.620526,0.1,0.1451162,2.608722,0.1,0.1221144,2.625938,1.1,1.986478,2.625938,1.1,2.006577,1.321079,1.1,1.997306,1.308576,0.9",
+            -1, "255,0,252,255", "red", "");
         CreatStand("electricball", "-3.986,3.766,1.085,0,0,0,0.4,0.4,0.4", null);
         HouseWeather.Instance.LoadSky("space");
         CreatData data = new CreatData("tv", "-1.56,-1.565,0.41,0,-90,0,0.7,0.7,0.7");
@@ -369,7 +371,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ss[2], out va)) w = va; else return null;
         if (float.TryParse(ss[3], out va)) h = va; else return null;
 
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("animal", cusname);
+        var ab = await Help.Instance.Load_Asdata_SP("animal", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, Root);
@@ -454,7 +456,7 @@ public class House : MonoBehaviour
         GameObject tr = null;
         if (string.IsNullOrEmpty(supplier))
         {
-            var ab = await Help.Instance.LoadAsherlinkdataInSAssets("appliances", cusname);
+            var ab = await Help.Instance.Load_Asdata_SP("appliances", cusname);
             if (ab == null) return null;
             tr = ab.LoadAsset<GameObject>(cusname);
         }
@@ -514,7 +516,7 @@ public class House : MonoBehaviour
     /// <summary>posxzy anglexyz scalexyz </summary>
     public async Task<Transform> CreatStand(string cusname, string color)
     {
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("stand", cusname);
+        var ab = await Help.Instance.Load_Asdata_SP("stand", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, Root);
@@ -531,12 +533,12 @@ public class House : MonoBehaviour
         AssetBundle ab = null;
         if (url.StartsWith("http"))
         {
-            ab = await Help.Instance.LoadAsherlinkdataInWWW(url, new System.Uri(url));
+            ab = await Help.Instance.Load_Asdata_www(url, new System.Uri(url));
         }
         else if (url.StartsWith("/"))
         {
             var cusurl = Help.Instance.CombineCustomdataPath(url.Remove(0, 1));
-            ab = await Help.Instance.LoadAsherlinkdataInWWW(cusurl, new System.Uri(cusurl));
+            ab = await Help.Instance.Load_Asdata_www(cusurl, new System.Uri(cusurl));
         }
         if (ab == null) return null;
         var bs = ab.LoadAllAssets();
@@ -590,7 +592,7 @@ public class House : MonoBehaviour
 
     public async Task<Transform> CreatEye(string cusname)
     {
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("look", cusname);
+        var ab = await Help.Instance.Load_Asdata_SP("look", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, Root);
@@ -604,7 +606,7 @@ public class House : MonoBehaviour
     {
         var vs = GetPoss(pos);
         if (vs == null) return null;
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("line", "flowline");
+        var ab = await Help.Instance.Load_Asdata_SP("line", "flowline");
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>("flowline");
         var lineE = Instantiate(tr, Root).GetComponent<LineEntity>();
@@ -670,7 +672,7 @@ public class House : MonoBehaviour
             if (float.TryParse(ss[6], out va)) canshu1 = va; else return null;
             if (float.TryParse(ss[7], out va)) canshu2 = va; else return null;
 
-            var ab = await Help.Instance.LoadAsherlinkdataInSAssets("door", cusname);
+            var ab = await Help.Instance.Load_Asdata_SP("door", cusname);
             if (ab == null) return null;
             var tr = ab.LoadAsset<GameObject>(cusname);
             tr = Instantiate(tr, Root);
@@ -737,8 +739,7 @@ public class House : MonoBehaviour
             //yield return Help.Instance.ABLoad("light", "arealight");
             //var ab = Help.Instance.GetBundle("light", "arealight");
             //var tr = ab.LoadAsset<GameObject>("arealight");
-            var prefab = transform.Find("arealight");
-            var tr = Instantiate(prefab, Root);
+            var tr = Instantiate(arealightPrefab, Root);
             tr.name = "light";
             tr.transform.position = new Vector3(x, 0.01f, y);
             tr.transform.localScale = new Vector3(w, 0.1f, h);
@@ -776,7 +777,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ss[4], out va)) tx = va; else return null;
         if (float.TryParse(ss[5], out va)) ty = va; else return null;
 
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("floor", cusname);
+        var ab = await Help.Instance.Load_Asdata_SP("floor", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Instantiate(tr, Root);
@@ -813,7 +814,7 @@ public class House : MonoBehaviour
         if (float.TryParse(ws[5], out va)) h = va; else return null;
         if (float.TryParse(ws[6], out va)) t = va; else return null;
 
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("wall", cusname);
+        var ab = await Help.Instance.Load_Asdata_SP("wall", cusname);
         if (!ab) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         var cube = Instantiate(tr, Root);
@@ -869,7 +870,7 @@ public class House : MonoBehaviour
                 }
                 else if (Input.GetMouseButton(0))
                 {
-                    if (Time.time - lastDownT > 1 && Vector3.Magnitude(Input.mousePosition - lastDownpos) < 9)
+                    if (Time.time - lastDownT > 1 && Vector3.Magnitude(Input.mousePosition - lastDownpos) < 30)
                     {
                         entity.LongClick();
                         lastDownT = Time.time + 1000;
@@ -877,7 +878,7 @@ public class House : MonoBehaviour
                 }
                 else if (Input.GetMouseButtonUp(0))
                 {
-                    if (Mathf.Abs(Time.time - lastDownT) < 0.5f && Vector3.Magnitude(Input.mousePosition - lastDownpos) < 9)
+                    if (Mathf.Abs(Time.time - lastDownT) < 0.5f && Vector3.Magnitude(Input.mousePosition - lastDownpos) < 30)
                     {
                         entity.Click();
                     }
@@ -1022,6 +1023,7 @@ public class House : MonoBehaviour
             cusname = door.Prop_Name;
             if (cusname == null) return;
             var canshu = door[cusname];
+            cusname = J_Stand20240901(cusname);
             var dic = canshu as IDictionary;
             if (dic == null) return;
             string pos = null, color = null, url = null;
@@ -1579,5 +1581,10 @@ public class House : MonoBehaviour
             return "yushi3";
         }
         return oldname;
+    }
+
+    internal void SetInDanger(bool danger)
+    {
+
     }
 }

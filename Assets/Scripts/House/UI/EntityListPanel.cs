@@ -1,100 +1,158 @@
+using EnhancedUI.EnhancedScroller;
+using LitJson;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using WebGLSupport.Detail;
 
-public class EntityListPanel : MonoBehaviour, IPanel
+public class EntityListPanel : MonoBehaviour, IPanel, IEnhancedScrollerDelegate
 {
-    public Button prefab, exit;
+    public Button exit, kong;
     public InputField sec;
-    List<Button> buttons;
     System.Action<string> callback;
-
-    Button self;
+    public EnhancedScroller scroller;
+    public EntityListChild cellViewPrefab;
 
     public Transform Tr { get; set; }
-
+    List<JsonData> temp;
     void Awake()
     {
-        buttons = new List<Button>(100);
-
+        temp = new List<JsonData>(999);
         sec.onEndEdit.AddListener((x) =>
         {
-            if (string.IsNullOrEmpty(x))
+            if (House.Instance.Hass == null)
             {
-                foreach (var item in buttons)
-                {
-                    if (item.GetComponentInChildren<Text>().text.Contains(x))
-                    {
-                        item.gameObject.SetActive(true);
-                    }
-                }
+                sec.text = "Œ¥º”‘ÿEntity!";
+                sec.textComponent.color = Color.red;
                 return;
             }
-            foreach (var item in buttons)
+            if (string.IsNullOrEmpty(x))
             {
-                if (item.GetComponentInChildren<Text>().text.Contains(x))
-                {
-                    item.gameObject.SetActive(true);
-                }
-                else
-                {
-                    item.gameObject.SetActive(false);
-                }
+                LoadAll();
+            }
+            else
+            {
+                LoadHasStr(x);
             }
         });
+
+        kong.onClick.AddListener(() =>
+        {
+            callback?.Invoke("");
+        });
+    }
+
+    private void LoadHasStr(string x)
+    {
+        temp.Clear();
+        House.Instance.Hass.Foreach((key, jd) =>
+        {
+            if (key != null)
+            {
+                if (key.Contains(x))
+                {
+                    temp.Add(jd);
+                }
+            }
+            else
+            {
+                if (jd.Contains("attributes"))
+                    if (jd["attributes"].Contains("friendly_name"))
+                    {
+                        var sn = jd["attributes"]["friendly_name"].ToString();
+                        if (sn.Contains(x))
+                            temp.Add(jd);
+                    }
+            }
+        });
+        scroller.ReloadData();
     }
 
     public void Start()
     {
+        scroller.Delegate = this;
         exit.onClick.AddListener(() =>
         {
             Surface.surface.RemovePanel<EntityListPanel>();
         });
 
-        if (House.Instance.HAeys.Count == 0)
+        if (House.Instance.Hass == null)
         {
             sec.text = "Œ¥º”‘ÿEntity!";
             sec.textComponent.color = Color.red;
-            prefab.gameObject.SetActive(false);
             return;
         }
+        LoadAll();
+    }
 
-        prefab.gameObject.SetActive(true);
-        var p1 = Instantiate(prefab, prefab.transform.parent);
-        p1.GetComponentInChildren<Text>().text = string.Empty;
-        p1.onClick.AddListener(() => callback?.Invoke(string.Empty));
-        buttons.Add(p1);
-        foreach (var item in House.Instance.HAeys)
+    private void LoadAll()
+    {
+        temp.Clear();
+        House.Instance.Hass.Foreach((key, jd) =>
         {
-            var p = Instantiate(prefab, prefab.transform.parent);
-            var t = p.GetComponentInChildren<Text>().text = item;
-            p.onClick.AddListener(() =>
+            temp.Add(jd);
+        });
+        scroller.ReloadData();
+    }
+
+    public int GetNumberOfCells(EnhancedScroller scroller)
+    {
+        return temp.Count;
+    }
+
+    public float GetCellViewSize(EnhancedScroller scroller, int dataIndex)
+    {
+        return 30f;
+    }
+
+    public EnhancedScrollerCellView GetCellView(EnhancedScroller scroller, int dataIndex, int cellIndex)
+    {
+        EntityListChild cellView = scroller.GetCellView(cellViewPrefab) as EntityListChild;
+        var jd = temp[dataIndex];
+        var sn = "";
+        if (jd.Contains("attributes"))
+        {
+            if (jd["attributes"].Contains("friendly_name"))
             {
-                callback?.Invoke(t);
-                Surface.surface.RemovePanel<EntityListPanel>();
-            });
-            buttons.Add(p);
+                sn = jd["attributes"]["friendly_name"].ToString();
+            }
         }
-        prefab.gameObject.SetActive(false);
+        if (jd.Contains("entity_id"))
+        {
+            sn += jd["entity_id"].ToString();
+        }
+        cellView.GetComponentInChildren<Text>().text = sn;
+        cellView.GetComponent<Button>().onClick.RemoveAllListeners();
+        cellView.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (jd.Contains("entity_id"))
+            {
+                callback?.Invoke(jd["entity_id"].ToString());
+            }
+        });
+        return cellView;
     }
 
     void OnEnable()
     {
-
+#if UNITY_WEBGL && !UNITY_EDITOR
+        WebGLInput.captureAllKeyboardInput = true;
+#endif
     }
 
     void OnDisable()
     {
-
+#if UNITY_WEBGL && !UNITY_EDITOR
+        WebGLInput.captureAllKeyboardInput = false;
+#endif
     }
 
     public void ChooseEntity(System.Action<string> back)
     {
+        transform.SetAsLastSibling();
         this.callback = back;
     }
-
-
 
     public void OnDestroy()
     {

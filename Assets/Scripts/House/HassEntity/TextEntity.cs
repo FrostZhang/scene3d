@@ -62,6 +62,6 @@ public class TextEntity : HassEntity
     internal void FlushText()
     {
         textMesh.text = front + value + back;
-        EmergencyPanel.instance.Show(transform, textMesh.text);
+        EmergencyPanel.instance.Show(textMesh.text);
     }
 }

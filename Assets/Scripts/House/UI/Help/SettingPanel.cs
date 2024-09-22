@@ -7,7 +7,7 @@ public class SettingPanel : MonoBehaviour, IPanel
 {
     public Slider roSpeed, sunlight, caH, zhiliang;
     public Toggle autosun, quanping;
-    public Button weather, bianji;
+    public Button weather, bianji, bianjiui;
     public Button guanyu;
     public Button coffee, exit;
 
@@ -58,7 +58,11 @@ public class SettingPanel : MonoBehaviour, IPanel
             QualitySettings.SetQualityLevel((int)x);
         });
 
-
+        bianjiui.onClick.AddListener(() =>
+        {
+            Surface.surface.RemovePanel<SettingPanel>();
+            Surface.surface.LoadPanel<EditoUIPanel>();
+        });
         quanping.onValueChanged.AddListener(SetBig);
 
         if (Shijie.WhichStand() == 1)
@@ -71,7 +75,7 @@ public class SettingPanel : MonoBehaviour, IPanel
 
         guanyu.onClick.AddListener(() =>
         {
-            Surface.surface.LoadPanel<SouquanPanel>();
+            //Surface.surface.LoadPanel<SouquanPanel>();
         });
 
         var tts = tos.GetComponentsInChildren<Toggle>();
@@ -100,7 +104,7 @@ public class SettingPanel : MonoBehaviour, IPanel
 
     private void SetBig(bool quanping)
     {
-        Shijie.Link3DBigView(quanping ? 1 : 0);
+        Screen.fullScreen = quanping;
     }
 
     private void Edit()

@@ -22,27 +22,20 @@ public class AlarmEntity : HassEntity
     {
         editR.enabled = true;
         line.gameObject.SetActive(true);
-        HouseWeather.Instance.SetInDanger(true);
+        House.Instance.SetInDanger(true);
     }
 
     protected override void TrunOff()
     {
         editR.enabled = false;
         line.gameObject.SetActive(false);
-        HouseWeather.Instance.SetInDanger(false);
+        House.Instance.SetInDanger(false);
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "Alarm On!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "Alarm Off!");
-    }
+
     public override void ReconstitutionMode(bool enter)
     {
         base.ReconstitutionMode(enter);
-        HouseWeather.Instance.SetInDanger(false);
+        House.Instance.SetInDanger(false);
         if (enter)
         {
             editR.enabled = true;
@@ -57,7 +50,7 @@ public class AlarmEntity : HassEntity
             }
             else
             {
-                HouseWeather.Instance.SetInDanger(true);
+                House.Instance.SetInDanger(true);
             }
         }
     }

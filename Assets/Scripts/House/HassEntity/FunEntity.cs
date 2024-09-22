@@ -28,14 +28,7 @@ public class FunEntity : HassEntity
     {
         StopAllCoroutines();
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "Fun On!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "Fun Off!");
-    }
+
     public override void ReconstitutionMode(bool enter)
     {
         if (enter)

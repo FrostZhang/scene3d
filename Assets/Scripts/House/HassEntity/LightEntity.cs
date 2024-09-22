@@ -51,14 +51,7 @@ public class LightEntity : HassEntity
         StopAllCoroutines();
         coroutine = StartCoroutine(To(0));
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "Light On!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "Light Off!");
-    }
+
     public override void ReconstitutionMode(bool enter)
     {
         _renderer.enabled = enter;

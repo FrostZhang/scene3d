@@ -34,14 +34,7 @@ public class LampEntity : HassEntity
     {
         mr.material.SetColor("_EmissionColor", Color.black);
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "Lamp On!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "Lamp Off!");
-    }
+
     public override void ReconstitutionMode(bool enter)
     {
         //base.ReconstitutionMode(enter);

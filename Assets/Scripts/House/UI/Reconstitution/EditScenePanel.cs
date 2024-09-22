@@ -12,7 +12,7 @@ public partial class EditScenePanel : MonoBehaviour, IPanel
 
     public StatesBtn changeCamera, roOrMove;
     public Button resetCamera, setting;
-    public Button save, exit;
+    public Button jed,save, exit;
     public Transform mainP;
     public Transform btns, panels;
     public RawImage icon;
@@ -79,29 +79,53 @@ public partial class EditScenePanel : MonoBehaviour, IPanel
         {
             EditMode.EditScene(false);
         });
+        jed.onClick.AddListener(() =>
+        {
+            mainP.gameObject.SetActive(false);
+        });
         save.onClick.AddListener(Save);
         var bs = btns.GetComponentsInChildren<Button>();
         for (int i = 0; i < bs.Length; i++)
         {
             var b = bs[i];
-            b.onClick.AddListener(() =>
+            if (b.name == "daoru")
             {
-                foreach (Transform item in panels)
+                b.onClick.AddListener(() => OnDaoRu());
+            }
+            else
+                b.onClick.AddListener(() =>
                 {
-                    if (item.name != b.name)
+                    foreach (Transform item in panels)
                     {
-                        item.gameObject.SetActive(false);
+                        if (item.name != b.name)
+                        {
+                            item.gameObject.SetActive(false);
+                        }
+                        else
+                        {
+                            item.gameObject.SetActive(true);
+                            mainP.gameObject.SetActive(false);
+                        }
                     }
-                    else
-                    {
-                        item.gameObject.SetActive(true);
-                        mainP.gameObject.SetActive(false);
-                    }
-                }
-            });
+                });
         }
-
         LoadStandPrefab();
+    }
+
+    private void OnDaoRu()
+    {
+        Shijie.LoadWebFile("EditScenePanel", ".gldf");
+    }
+
+    //Shijie.LoadWebFile 回调
+    public void FileDialogResult(string JsFileInfoStr)
+    {
+        mainP.gameObject.SetActive(false);
+        Debug.Log(JsFileInfoStr);
+        //JSFileInfo jsFileInfo = JsonConvert.DeserializeObject<JSFileInfo>(JsFileInfoStr);
+        //Debug.Log(jsFileInfo.Path);
+        //Debug.Log(jsFileInfo.FileName);
+        //StartCoroutine(LoadData(jsFileInfo, null));
     }
 
     private void Set3D2D(int x)
@@ -131,6 +155,7 @@ public partial class EditScenePanel : MonoBehaviour, IPanel
     {
         var hs = House.Instance.House2Json();
         Shijie.Config3D(hs);
+        EmergencyPanel.instance.Show("已发送保存指令，建议刷新网页验证保存效果");
 #if UNITY_EDITOR
         var path = Application.streamingAssetsPath + "/Customdata/houseconnfig.json";
         var dir = System.IO.Path.GetDirectoryName(path);
@@ -144,7 +169,7 @@ public partial class EditScenePanel : MonoBehaviour, IPanel
 
     private async Task LoadStandPrefab()
     {
-        var te = await Help.Instance.LoadTextlocal(true, "3dscene.json", false);
+        var te = await Help.Instance.LoadStreamingAssetsText("3dscene.json", false);
         if (te != null)
         {
             var jd = LitJson.JsonMapper.ToObject(te);

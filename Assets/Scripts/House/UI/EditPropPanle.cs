@@ -56,6 +56,7 @@ public class EditPropPanle : MonoBehaviour, IPanel
     {
         Ondel = null;
     }
+
     void OnEnable()
     {
 #if UNITY_WEBGL && !UNITY_EDITOR

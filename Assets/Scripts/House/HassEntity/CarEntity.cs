@@ -30,18 +30,7 @@ public class CarEntity : HassEntity
         StopAllCoroutines();
         StartCoroutine(Anim(false));
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "Car home!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "Car Leave home!");
-    }
-    protected override void HassDestine(string state)
-    {
-        EmergencyPanel.instance.Show(transform, state);
-    }
+
     public override void ReconstitutionMode(bool enter)
     {
         base.ReconstitutionMode(enter);

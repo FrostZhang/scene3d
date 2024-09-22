@@ -40,14 +40,7 @@ public class TVEntity : HassEntity
     {
         onOnj.SetActive(false);
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "TV On!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "TV Off!");
-    }
+
     public override void ReconstitutionMode(bool enter)
     {
         //onOnj.SetActive(enter);

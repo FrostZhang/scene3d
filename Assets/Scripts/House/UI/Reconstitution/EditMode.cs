@@ -40,7 +40,10 @@ public class EditMode : MonoBehaviour
     }
     private void OnDestroy()
     {
-        chhadle.DeleteAll();
+        if (House.Instance)
+        {
+            chhadle.DeleteAll();
+        }
     }
     public static void BeginDraw()
     {

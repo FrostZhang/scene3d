@@ -14,7 +14,6 @@ public class HouseWeather : HassEntity
     public Color32 cH = new Color32(255, 255, 218, 255);
     public Color32 cL = new Color32(0, 0, 0, 255);
 
-    public Volume volume;
     string skyname;
     bool ready;
     ParticleSystem rmain;
@@ -210,7 +209,7 @@ public class HouseWeather : HassEntity
     {
         if (string.IsNullOrWhiteSpace(str) || skyname == str) return;
         skyname = str;
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("sky", str);
+        var ab = await Help.Instance.Load_Asdata_SP("sky", str);
         if (ab)
         {
             var ma = ab.LoadAsset<Material>(str);
@@ -223,7 +222,7 @@ public class HouseWeather : HassEntity
     async Task LoadRain(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("weather", str);
+        var ab = await Help.Instance.Load_Asdata_SP("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -239,7 +238,7 @@ public class HouseWeather : HassEntity
     async Task LoadSnow(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("weather", str);
+        var ab = await Help.Instance.Load_Asdata_SP("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -255,7 +254,7 @@ public class HouseWeather : HassEntity
     async Task LoadFog(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("weather", str);
+        var ab = await Help.Instance.Load_Asdata_SP("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -271,7 +270,7 @@ public class HouseWeather : HassEntity
     async Task LoadLighting(string str)
     {
         if (string.IsNullOrWhiteSpace(str)) goto err;
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("weather", str);
+        var ab = await Help.Instance.Load_Asdata_SP("weather", str);
         if (!ab) goto err;
         var parti = ab.LoadAsset<GameObject>(str);
         if (!parti) goto err;
@@ -284,58 +283,4 @@ public class HouseWeather : HassEntity
         Debug.LogError("‘ÿ»Î¥ÌŒÛ");
     }
 
-    public void SetBloom(float value)
-    {
-        Bloom bl;
-        if (volume.sharedProfile.TryGet<Bloom>(out bl))
-        {
-            bl.intensity.value = value;
-        }
-    }
-
-    public void SetVignette(float value)
-    {
-        Vignette bl;
-        if (volume.sharedProfile.TryGet<Vignette>(out bl))
-        {
-            bl.intensity.value = value;
-        }
-    }
-
-    public void SetVignette(Color value)
-    {
-        Vignette bl;
-        if (volume.sharedProfile.TryGet<Vignette>(out bl))
-        {
-            bl.color.value = value;
-        }
-    }
-
-    Coroutine dangerCor;
-    public void SetInDanger(bool value)
-    {
-        if (!value)
-        {
-            if (dangerCor != null)
-            {
-                StopCoroutine(dangerCor);
-                dangerCor = null;
-            }
-            SetVignette(0);
-            return;
-        }
-        if (dangerCor != null)
-            return;
-        dangerCor = StartCoroutine(danger());
-    }
-
-    IEnumerator danger()
-    {
-        SetVignette(Color.red);
-        while (true)
-        {
-            SetVignette(Mathf.PingPong(Time.time, 0.5f));
-            yield return null;
-        }
-    }
 }

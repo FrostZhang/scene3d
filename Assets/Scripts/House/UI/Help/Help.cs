@@ -17,7 +17,7 @@ public class Help : MonoBehaviour
     List<string> works;
 
     public string streamingAssetsPath { get; private set; } = Application.streamingAssetsPath;
-    public string customdatapath { get; private set; } = Application.streamingAssetsPath + "/Customdata";
+    public string customdirpath { get; private set; } = Application.streamingAssetsPath + "/Customdata";
 
     private void Awake()
     {
@@ -47,9 +47,11 @@ public class Help : MonoBehaviour
         houseEntityTypes.Add("animal", HouseEntityType.animal);
         houseEntityTypes.Add("weather", HouseEntityType.weather);
         houseEntityTypes.Add("eye", HouseEntityType.eye);
+
+        //在playersetting保障Shijie必须在help前初始化
 #if UNITY_WEBGL && !UNITY_EDITOR
         streamingAssetsPath = Shijie.domain + "/3dscene_local/StreamingAssets";
-        customdatapath = Shijie.domain + "/3dscene_local/Customdata";
+        customdirpath = Shijie.domain + "/3dscene_local/Customdata";
 #endif
     }
 
@@ -63,7 +65,7 @@ public class Help : MonoBehaviour
     public string CombineAsherlinkdataInCustomdata(string root, string key)
     {
         string dk = key + "_" + root + ".asherlinkdata";
-        var path = $"{customdatapath}/{root}/{dk}";
+        var path = $"{customdirpath}/{root}/{dk}";
         return path;
     }
 
@@ -79,7 +81,7 @@ public class Help : MonoBehaviour
 
     public string CombineCustomdataPath(params string[] rpath)
     {
-        var path = customdatapath;
+        var path = customdirpath;
         foreach (var item in rpath)
         {
             path += "/" + item;
@@ -87,7 +89,7 @@ public class Help : MonoBehaviour
         return path;
     }
 
-    public async Task<AssetBundle> LoadAsherlinkdataInSAssets(string root, string key)
+    public async Task<AssetBundle> Load_Asdata_SP(string root, string key)
     {
         string bundleID = key + "_" + root + ".asherlinkdata";
         if (bundles.ContainsKey(bundleID))
@@ -117,12 +119,12 @@ public class Help : MonoBehaviour
             await new WaitUntilAsync(() => bundles.ContainsKey(bundleID));
             return bundles[bundleID];
         }
-        var path = $"{customdatapath}/{supplier}/{root}/{dataname}";
+        var path = $"{customdirpath}/{supplier}/{root}/{dataname}";
         System.Uri uri = new System.Uri(path);
         return await LoadAssetBundle(bundleID, uri);
     }
 
-    public async Task<AssetBundle> LoadAsherlinkdataInWWW(string bundleID, System.Uri uri)
+    public async Task<AssetBundle> Load_Asdata_www(string bundleID, System.Uri uri)
     {
         if (bundles.ContainsKey(bundleID))
         {
@@ -168,7 +170,7 @@ public class Help : MonoBehaviour
         }
         else
         {
-            uri = new System.Uri(customdatapath + "/" + path);
+            uri = new System.Uri(customdirpath + "/" + path);
         }
         using (var request = UnityWebRequestTexture.GetTexture(uri))
         {
@@ -203,18 +205,21 @@ public class Help : MonoBehaviour
         return null;
     }
 
-    public async Task<string> LoadTextlocal(bool isstreamingAssets, string path, bool cache = true)
+    public Task<string> LoadCustomDirText(string path, bool cache = true)
+    {
+        return LoadWWWText(customdirpath + "/" + path, cache);
+    }
+
+    public Task<string> LoadStreamingAssetsText(string path, bool cache = true)
+    {
+        return LoadWWWText(streamingAssetsPath + "/" + path, cache);
+    }
+
+    public async Task<string> LoadWWWText(string wwwpath, bool cache = true)
     {
         System.Uri uri;
         string res = null;
-        if (isstreamingAssets)
-        {
-            uri = new System.Uri(streamingAssetsPath + "/" + path);
-        }
-        else
-        {
-            uri = new System.Uri(customdatapath + "/" + path);
-        }
+        uri = new System.Uri(wwwpath);
         using (var request = new UnityWebRequest(uri))
         {
             if (!cache)
@@ -228,7 +233,7 @@ public class Help : MonoBehaviour
             await request.SendWebRequest();
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError("找不到地址:" + path);
+                Debug.LogError("找不到地址:" + wwwpath);
             }
             else
             {

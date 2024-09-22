@@ -83,8 +83,6 @@ public class CameraControllerForUnity : MonoBehaviour
     float checkAutoRo = 0;
     const float checkInterval = 4;
     Vector3 lastMousepos;
-
-
     void LateUpdate()
     {
         bool isOnUI = VerifyUI();
@@ -431,7 +429,7 @@ public class CameraControllerForUnity : MonoBehaviour
 
             //（新距离）减去（旧距离）得出的差如果是负数的话缩小，正数就放大
             float offset = newDistance - oldDistance;
-            mousez = -offset / 100;
+            mousez = -offset / Screen.width;
             //记住最新的触摸点位置，下次使用  
             oldPos1 = touch1.position;
             oldPos2 = touch2.position;

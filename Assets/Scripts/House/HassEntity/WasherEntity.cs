@@ -20,14 +20,6 @@ public class WasherEntity : HassEntity
     {
         StopAllCoroutines();
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "Washer On!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "Washer Off!");
-    }
 
     float interval = 3;
     IEnumerator Anim()

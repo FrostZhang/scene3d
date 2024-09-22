@@ -19,7 +19,9 @@ public class SysPanel : MonoBehaviour
         addwwwResource.onClick.AddListener(() =>
         {
             var ap = Resources.Load<GameObject>("UI/AddModelPanel");
-            ap = Instantiate(ap, House.Instance.canvas);
+
+            
+            ap = Instantiate(ap, Surface.surface.transform);
         });
     }
 

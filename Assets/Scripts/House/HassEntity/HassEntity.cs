@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LitJson;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,8 @@ using UnityEngine;
 public class HassEntity : MonoBehaviour
 {
     public string Entity_id { get => entity_id; } //homeassitant entity ID
+    public JsonData HassObj { get; private set; }
+
     public Collider editC;  //交互体
     protected string entity_id;
     //const string switchkey = "switch";//对标 homeassistant 状态协议 on off
@@ -18,13 +21,16 @@ public class HassEntity : MonoBehaviour
     //const string fan = "fan"; //对标 homeassistant 状态协议 on off
     const string on = "on"; //对标 homeassistant 状态协议
     const string off = "off"; //对标 homeassistant 状态协议
-    protected const string undefine = "undefine"; //对标 homeassistant 状态协议
+    const string undefine = "undefine"; //对标 homeassistant 状态协议
+    const string unavailable = "unavailable"; //对标 homeassistant 状态协议
+    const string unknown = "unknown"; //对标 homeassistant 状态协议
 
     string head;    //todo 由用户提供，在面板绑定ID会被解析作为指令发给homeassitant，这里有bug！
     const string cmdon = "turn_on"; //对标 homeassistant 状态协议
     const string cmdoff = "turn_off"; //对标 homeassistant 状态协议
     protected bool open = false;    //获得状态，目前只接了homeassitant开关。原因全接数据量过大还没优化！
     string lastState;
+
     /// <summary> bingding homeassistant </summary>
     public void SetEntity(string id)
     {
@@ -84,11 +90,11 @@ public class HassEntity : MonoBehaviour
     }
     protected virtual void TrunOn()
     {
-        
+
     }
     protected virtual void TrunOff()
     {
-        
+
     }
     /// <summary>from hass message. not on/off</summary>
     protected virtual void HassDestine(string state)
@@ -105,21 +111,28 @@ public class HassEntity : MonoBehaviour
     /// <summary>from hass message open cmd</summary>
     protected virtual void HassStateOn()
     {
-        
+        var na = HassObj?["attributes"]?["friendly_name"]?.ToString();
+        EmergencyPanel.instance.Show(na + " 打开!");
     }
 
     /// <summary>from hass message close cmd</summary>
     protected virtual void HassStateOff()
     {
-
+        var na = HassObj?["attributes"]?["friendly_name"]?.ToString();
+        EmergencyPanel.instance.Show(na + " 关闭!");
     }
 
     /// <summary> from hass message ans: on/off/other</summary>
-    public void StateMeassge(string state)
+    public void StateMeassge(LitJson.JsonData hassObj)
     {
+        this.HassObj = hassObj;
+        var state = hassObj["state"].ToString();
         if (state == lastState)
             return;
         lastState = state;
+        //if (state == unavailable || state == unknown || state == undefine)
+        //{
+        //}
         if (state == on)
         {
             if (!open)

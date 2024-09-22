@@ -228,7 +228,12 @@ namespace LitJson
         {
             get
             {
-                return EnsureDictionary()[key];
+                var dic = EnsureDictionary();
+                if (dic.Contains(key))
+                {
+                    return dic[key];
+                }
+                return null;
             }
 
             set

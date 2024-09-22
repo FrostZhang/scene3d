@@ -14,21 +14,11 @@ public class EmergencyPanel : MonoBehaviour, IPanel
     {
         content.gameObject.SetActive(false);
         instance = this;
-        CacheData.OnEditorMode += OnEditorMode;
     }
 
-    private void OnEditorMode(bool v)
+    public void Show(string mes)
     {
-        if (v)
-        {
-            StopAllCoroutines();
-        }
-    }
-
-    public void Show(Transform bind, string mes)
-    {
-        if (CacheData.isEditorMode)
-            return;
+        Tr.SetAsLastSibling();
         StopAllCoroutines();
         StartCoroutine(_Anim(mes));
     }
@@ -43,7 +33,8 @@ public class EmergencyPanel : MonoBehaviour, IPanel
 
     public void Hide()
     {
-        
+        StopAllCoroutines();
+        content.gameObject.SetActive(false);
     }
 
     public void Start()

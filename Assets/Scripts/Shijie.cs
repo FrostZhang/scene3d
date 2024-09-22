@@ -7,46 +7,6 @@ using UnityEngine.UI;
 
 public class Shijie : MonoBehaviour
 {
-    public static Action<string> OnGetConfig;
-    public static Action<string> OnHassFlush;
-    public static string domain;
-    void Awake()
-    {
-#if UNITY_WEBGL && !UNITY_EDITOR
-        WebGLInput.captureAllKeyboardInput = false;
-#endif
-        var path = Application.streamingAssetsPath;
-        var index = path.IndexOf('/', 8);
-        if (index != -1)
-        {
-            domain = path.Remove(index);
-            Debug.Log(domain);
-        }
-    }
-
-    private void Start()
-    {
-        var res = WhichStand();
-        if (res == 1)
-        {
-            QualitySettings.SetQualityLevel(0);
-            var data = Camera.main.GetUniversalAdditionalCameraData();
-            data.renderPostProcessing = true;
-            data.antialiasing = AntialiasingMode.None;
-            HouseWeather.Instance.volume.enabled = true;
-        }
-    }
-
-    public void HassConfig(string configStr)
-    {
-        OnGetConfig.Invoke(configStr);
-    }
-
-    public void HassMessage(string str)
-    {
-        OnHassFlush?.Invoke(str);
-    }
-
     [System.Runtime.InteropServices.DllImport("__Internal")]
     static extern void WebglAsherLink3DStart();
     [System.Runtime.InteropServices.DllImport("__Internal")]
@@ -58,9 +18,49 @@ public class Shijie : MonoBehaviour
     [System.Runtime.InteropServices.DllImport("__Internal")]
     static extern void WebglAsherLink3DConfig(string mes);
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    private static extern float WebglHelloFloat();
+    static extern void WebglAsherLinkUIConfig(string mes);
     [System.Runtime.InteropServices.DllImport("__Internal")]
-    private static extern void WebglBigView(int style);
+    private static extern float WebglHelloFloat();
+
+    [System.Runtime.InteropServices.DllImport("__Internal")]
+    static extern void LoadFile(string gameobjectName, string fitter);
+
+    [System.Runtime.InteropServices.DllImport("__Internal")]
+    static extern string WebglGetHass();
+
+    public static Action<string> OnGetConfig;
+    public static Action<string> OnHassFlush;
+    public static string domain;
+    float lastUpdateT;
+    void Awake()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        Shijie.Link3DStart();
+        WebGLInput.captureAllKeyboardInput = false;
+#endif
+        var path = Application.streamingAssetsPath;
+        var index = path.IndexOf('/', 8);
+        if (index != -1)
+        {
+            domain = path.Remove(index);
+            Debug.Log(domain);
+        }
+    }
+
+    public void HassConfig(string configStr)
+    {
+        OnGetConfig.Invoke(configStr);
+    }
+
+    public void HassUpdate(string hassmeg)
+    {
+        //var res = WebglGetHass();
+        //if (res != null)
+        {
+            OnHassFlush?.Invoke(hassmeg);
+        }
+    }
+
     public static void Link3DStart()
     {
 #if UNITY_EDITOR
@@ -68,8 +68,6 @@ public class Shijie : MonoBehaviour
 #else
          WebglAsherLink3DStart();
 #endif
-
-
     }
 
     public static void ClickMessage(string mes)
@@ -108,6 +106,25 @@ public class Shijie : MonoBehaviour
 #endif
     }
 
+    public static void ConfigUI(string mes)
+    {
+#if UNITY_EDITOR
+        Debug.Log(mes);
+#else
+         WebglAsherLinkUIConfig(mes);
+#endif
+    }
+
+    public static string GetHass()
+    {
+#if UNITY_EDITOR
+        Debug.Log("get hass back");
+        return null;
+#else
+        return WebglGetHass();
+#endif
+    }
+
     public static float WhichStand()
     {
 #if UNITY_EDITOR
@@ -117,12 +134,13 @@ public class Shijie : MonoBehaviour
 #endif
     }
 
-    public static void Link3DBigView(int bigstyle)
+    public static void LoadWebFile(string gameobjectName, string fitter)
     {
 #if UNITY_EDITOR
+        Debug.Log("请求载入本地资源");
         return;
 #else
-        WebglBigView(bigstyle);
+        LoadFile(gameobjectName, fitter);
 #endif
     }
 }

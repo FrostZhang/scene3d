@@ -56,17 +56,10 @@ public class ACEntity : HassEntity
         {
             eff.gameObject.SetActive(false);
         }
-        EmergencyPanel.instance.Show(transform, "AC " + state + "!");
-    }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "AC On!");
+        var na = HassObj?["attributes"]?["friendly_name"]?.ToString();
+        EmergencyPanel.instance.Show(na + " ×´Ì¬±äÎª£º" + state);
     }
 
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "AC Off!");
-    }
     public override void ReconstitutionMode(bool enter)
     {
         if (enter)

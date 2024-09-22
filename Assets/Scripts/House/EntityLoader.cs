@@ -51,7 +51,7 @@ public class StandProxy
     /// <summary>posxzy anglexyz scalexyz </summary>
     public async Task<Transform> CreatStand(string cusname, string color)
     {
-        var ab = await Help.Instance.LoadAsherlinkdataInSAssets("stand", cusname);
+        var ab = await Help.Instance.Load_Asdata_SP("stand", cusname);
         if (ab == null) return null;
         var tr = ab.LoadAsset<GameObject>(cusname);
         tr = Object.Instantiate(tr, parent);
@@ -68,12 +68,12 @@ public class StandProxy
         AssetBundle ab = null;
         if (url.StartsWith("http"))
         {
-            ab = await Help.Instance.LoadAsherlinkdataInWWW(url, new System.Uri(url));
+            ab = await Help.Instance.Load_Asdata_www(url, new System.Uri(url));
         }
         else if (url.StartsWith("/"))
         {
             var cusurl = Help.Instance.CombineCustomdataPath(url.Remove(0, 1));
-            ab = await Help.Instance.LoadAsherlinkdataInWWW(cusurl, new System.Uri(cusurl));
+            ab = await Help.Instance.Load_Asdata_www(cusurl, new System.Uri(cusurl));
         }
         if (ab == null) return null;
         var bs = ab.LoadAllAssets();

@@ -33,14 +33,7 @@ public class DoorEntity : HassEntity
         StopAllCoroutines();
         coroutine = StartCoroutine(To(angleclose));
     }
-    protected override void HassStateOn()
-    {
-        EmergencyPanel.instance.Show(transform, "Door On!");
-    }
-    protected override void HassStateOff()
-    {
-        EmergencyPanel.instance.Show(transform, "Door Off!");
-    }
+
     IEnumerator To(float f)
     {
         float t = 1 / 2f;

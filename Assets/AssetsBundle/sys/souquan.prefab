@@ -855,7 +855,7 @@ GameObject:
   - component: {fileID: 2473442105629214893}
   - component: {fileID: 2473442105629214899}
   m_Layer: 5
-  m_Name: SouquanPanel
+  m_Name: souquan
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
